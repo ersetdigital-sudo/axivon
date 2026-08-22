@@ -59,29 +59,29 @@ export default function MobileLegendsPage() {
     <>
       <Header />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-5 pt-5 text-sm text-[#9aa3ad] flex items-center gap-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-5 pt-4 pb-2 text-sm text-[#9aa3ad] flex items-center gap-2">
         <Link href="/" className="hover:text-white transition">Home</Link>
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="m9 6 6 6-6 6" />
         </svg>
         <span className="text-[#eef1f4]">Mobile Legends</span>
       </div>
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-5 py-6 pb-24 lg:pb-6">
-        {/* Mobile: sidebar on top, stacked */}
-        <div className="lg:hidden space-y-4 mb-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-5 py-4 pb-24 lg:pb-6 overflow-hidden">
+        {/* Mobile: game info on top */}
+        <div className="lg:hidden mb-4">
           <GameInfoCard />
         </div>
 
-        <div className="grid lg:grid-cols-[330px_1fr] gap-6 items-start">
+        <div className="flex flex-col lg:grid lg:grid-cols-[330px_1fr] gap-5 items-start">
           {/* Desktop sidebar */}
-          <aside className="hidden lg:block lg:sticky lg:top-24 space-y-4">
+          <aside className="hidden lg:block lg:sticky lg:top-24 space-y-4 w-full">
             <GameInfoCard />
             <HowToTopUp />
             <HelpCard />
           </aside>
 
-          <div className="space-y-4">
+          <div className="w-full min-w-0 space-y-4">
             <NoticeBar />
 
           <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-1.5 grid grid-cols-2 gap-1.5 text-sm">
@@ -118,7 +118,7 @@ export default function MobileLegendsPage() {
 function GameInfoCard() {
   return (
     <div className="bg-[#171a1f] border border-[#262b33] rounded-xl overflow-hidden">
-      <div className="p-5 flex gap-4 items-center">
+      <div className="p-4 sm:p-5 flex gap-3 sm:gap-4 items-center">
         <Image src="/images/8f47dd26-4142-498f-a61c-14f17dc5cd18.png" alt="Mobile Legends" width={80} height={80}
           className="w-20 h-20 rounded-xl object-cover border border-[#262b33]" />
         <div>
@@ -156,7 +156,7 @@ function HowToTopUp() {
     "Diamond masuk otomatis ke akunmu.",
   ];
   return (
-    <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <h2 className="font-bold text-sm">Cara top up Mobile Legends</h2>
       <ol className="mt-3 space-y-2.5 text-sm text-[#9aa3ad]">
         {steps.map((s, i) => (
@@ -172,7 +172,7 @@ function HowToTopUp() {
 
 function HelpCard() {
   return (
-    <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-2 text-sm font-semibold">
         <svg className="w-4 h-4 text-[#ffb020]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="9" />
@@ -210,12 +210,12 @@ function Step1Nominal({ ntabs, activeNtab, setActiveNtab, nominals, selectedNomi
   nominals: NominalItem[]; selectedNominal: number; setSelectedNominal: (n: number) => void;
 }) {
   return (
-    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">1</span>
         <h2 className="font-bold text-lg">Pilih nominal</h2>
       </div>
-      <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1 text-sm">
+      <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1 text-sm -mx-4 sm:mx-0 px-4 sm:px-0">
         {ntabs.map((t, i) => (
           <button key={t} onClick={() => setActiveNtab(i)}
             className={`shrink-0 px-3.5 py-1.5 rounded-lg font-semibold transition ${activeNtab === i ? "bg-[#eef1f4] text-[#101215]" : "bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] hover:text-white"}`}>
@@ -256,7 +256,7 @@ function Step2Account({ uid, setUid, zid, setZid }: {
   uid: string; setUid: (v: string) => void; zid: string; setZid: (v: string) => void;
 }) {
   return (
-    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">2</span>
         <h2 className="font-bold text-lg">Masukkan akun</h2>
@@ -286,7 +286,7 @@ function Step3Payment({ payments, selectedPayment, setSelectedPayment }: {
   payments: PaymentItem[]; selectedPayment: number; setSelectedPayment: (n: number) => void;
 }) {
   return (
-    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">3</span>
         <h2 className="font-bold text-lg">Metode pembayaran</h2>
@@ -323,7 +323,7 @@ function SummaryPanel({ nom, pay, total, account, showWarn, setShowWarn, uid, zi
   };
 
   return (
-    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
+    <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <h2 className="font-bold text-lg">Ringkasan pesanan</h2>
       <dl className="mt-4 space-y-2.5 text-sm">
         <div className="flex justify-between gap-4"><dt className="text-[#9aa3ad]">Produk</dt><dd className="font-semibold text-right">{nom.label}</dd></div>
