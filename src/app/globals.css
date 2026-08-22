@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #101215;
+  --bg-2: #171a1f;
+  --surface: #1c2026;
+  --line: #262b33;
+  --ink: #eef1f4;
+  --muted: #9aa3ad;
+  --accent: #ff5c2b;
+  --accent-2: #ffb020;
+  --ok: #2fbf71;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-ok: var(--ok);
+  --font-sans: var(--font-plus-jakarta);
+  --font-display: var(--font-bricolage);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
 }
+
+h1, h2, h3, .display {
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  letter-spacing: -.015em;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.swiper-pagination-bullet { background: #fff; opacity: .3; }
+.swiper-pagination-bullet-active { background: var(--accent); opacity: 1; width: 20px; border-radius: 999px; }
+
+details[open] .chev { transform: rotate(180deg); }
+.chev { transition: transform .2s ease; }
+
+.opt { cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.opt:hover { border-color: #3a424e; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt input:checked + .opt-body { border-color: var(--accent); background: #231a17; }
+.opt input:checked + .opt-body .tick { opacity: 1; }
+.tick { opacity: 0; transition: opacity .15s ease; }
+
+.field { background: #12151a; border: 1px solid var(--line); }
+.field:focus { outline: none; border-color: var(--accent); }
+
+.step-no { background: var(--accent); color: #fff; }
+
+.tab-active { background: var(--ink); color: #101215; }
