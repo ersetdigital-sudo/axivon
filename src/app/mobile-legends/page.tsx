@@ -67,15 +67,22 @@ export default function MobileLegendsPage() {
         <span className="text-[#eef1f4]">Mobile Legends</span>
       </div>
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-5 py-6 grid lg:grid-cols-[330px_1fr] gap-6 items-start">
-        <aside className="lg:sticky lg:top-24 space-y-4">
+      <main className="mx-auto max-w-7xl px-4 sm:px-5 py-6 pb-24 lg:pb-6">
+        {/* Mobile: sidebar on top, stacked */}
+        <div className="lg:hidden space-y-4 mb-6">
           <GameInfoCard />
-          <HowToTopUp />
-          <HelpCard />
-        </aside>
+        </div>
 
-        <div className="space-y-4">
-          <NoticeBar />
+        <div className="grid lg:grid-cols-[330px_1fr] gap-6 items-start">
+          {/* Desktop sidebar */}
+          <aside className="hidden lg:block lg:sticky lg:top-24 space-y-4">
+            <GameInfoCard />
+            <HowToTopUp />
+            <HelpCard />
+          </aside>
+
+          <div className="space-y-4">
+            <NoticeBar />
 
           <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-1.5 grid grid-cols-2 gap-1.5 text-sm">
             {["Pembelian", "Gift Voucher"].map((t, i) => (
@@ -96,6 +103,7 @@ export default function MobileLegendsPage() {
           <Step3Payment payments={payments} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} />
 
           <SummaryPanel nom={nom} pay={pay} total={total} account={account} showWarn={showWarn} setShowWarn={setShowWarn} uid={uid} zid={zid} />
+          </div>
         </div>
       </main>
 
@@ -216,7 +224,7 @@ function Step1Nominal({ ntabs, activeNtab, setActiveNtab, nominals, selectedNomi
         ))}
       </div>
       <h3 className="mt-5 text-sm font-semibold text-[#9aa3ad]">Harga spesial minggu ini</h3>
-      <div className="mt-3 grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {nominals.map((n, i) => (
           <label key={i} className="relative block cursor-pointer" onClick={() => setSelectedNominal(i)}>
             <div className={`bg-[#1c2026] border rounded-xl p-4 h-full transition ${selectedNominal === i ? "border-[#ff5c2b] bg-[#231a17]" : "border-[#262b33]"}`}>
@@ -253,7 +261,7 @@ function Step2Account({ uid, setUid, zid, setZid }: {
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">2</span>
         <h2 className="font-bold text-lg">Masukkan akun</h2>
       </div>
-      <div className="mt-4 grid sm:grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="text-xs font-semibold text-[#9aa3ad]">User ID</label>
           <input type="text" inputMode="numeric" placeholder="1234567" value={uid} onChange={(e) => setUid(e.target.value)}
@@ -283,7 +291,7 @@ function Step3Payment({ payments, selectedPayment, setSelectedPayment }: {
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">3</span>
         <h2 className="font-bold text-lg">Metode pembayaran</h2>
       </div>
-      <div className="mt-4 grid sm:grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {payments.map((p, i) => (
           <label key={i} className="relative block cursor-pointer" onClick={() => setSelectedPayment(i)}>
             <div className={`bg-[#1c2026] border rounded-xl px-4 py-3 flex items-center justify-between transition ${selectedPayment === i ? "border-[#ff5c2b]" : "border-[#262b33]"}`}>
