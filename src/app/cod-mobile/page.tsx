@@ -26,7 +26,10 @@ const config: GameTopUpConfig = {
     { label: "800 CP", price: 142000, oldPrice: 152000, desc: "Bonus +90 CP", coins: 800, iconColor: "text-[#ff5c2b]" },
     { label: "2000 CP", price: 348000, oldPrice: 370000, desc: "Bonus +240 CP", coins: 2000, iconColor: "text-[#ff5c2b]" },
     { label: "5000 CP", price: 845000, oldPrice: 895000, desc: "Bonus +650 CP", coins: 5000, iconColor: "text-[#ff5c2b]" },
-    { label: "Battle Pass", price: 99000, oldPrice: 109000, desc: "Akses 100 tier reward", coins: 990, iconColor: "text-[#c07bff]", badge: "HOT" },
+    { label: "10000 CP", price: 1650000, oldPrice: 1750000, desc: "Bonus +1400 CP", coins: 10000, iconColor: "text-[#ff5c2b]" },
+    { label: "20800 CP", price: 3390000, oldPrice: 3580000, desc: "Bonus +3000 CP", coins: 20800, iconColor: "text-[#ff5c2b]" },
+    { label: "Battle Pass", price: 99000, oldPrice: 109000, desc: "Akses 100 tier reward", coins: 990, iconColor: "text-[#c07bff]" },
+    { label: "Battle Pass Bundle", price: 249000, oldPrice: 289000, desc: "Pass + 1000 CP bonus", coins: 2490, iconColor: "text-[#c07bff]", badge: "HOT" },
   ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },

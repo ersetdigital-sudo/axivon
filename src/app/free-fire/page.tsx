@@ -27,7 +27,10 @@ const config: GameTopUpConfig = {
     { label: "355 Diamond", price: 58000, oldPrice: 63000, desc: "Bonus +30", coins: 355, iconColor: "text-[#ff5c2b]" },
     { label: "720 Diamond", price: 115000, oldPrice: 125000, desc: "Bonus +70", coins: 720, iconColor: "text-[#ff5c2b]" },
     { label: "1450 Diamond", price: 228000, oldPrice: 245000, desc: "Bonus +150", coins: 1450, iconColor: "text-[#ff5c2b]" },
-    { label: "Weekly Membership", price: 28900, oldPrice: 32000, desc: "Diamond harian 7 hari", coins: 289, iconColor: "text-[#c07bff]", badge: "BEST" },
+    { label: "2180 Diamond", price: 339000, oldPrice: 365000, desc: "Bonus +250", coins: 2180, iconColor: "text-[#ff5c2b]" },
+    { label: "3680 Diamond", price: 559000, oldPrice: 595000, desc: "Bonus +450", coins: 3680, iconColor: "text-[#ff5c2b]" },
+    { label: "Weekly Membership", price: 28900, oldPrice: 32000, desc: "Diamond harian 7 hari", coins: 289, iconColor: "text-[#c07bff]" },
+    { label: "Monthly Membership", price: 79900, oldPrice: 89000, desc: "Diamond harian 30 hari", coins: 799, iconColor: "text-[#c07bff]", badge: "BEST" },
   ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },

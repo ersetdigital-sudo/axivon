@@ -25,10 +25,13 @@ const config: GameTopUpConfig = {
   nominals: [
     { label: "Weekly Diamond Pass", price: 32100, oldPrice: 35000, desc: "Event Topup +100", coins: 321, iconColor: "text-[#5bc8ff]" },
     { label: "Weekly Diamond Pass x3", price: 96300, oldPrice: 105000, desc: "Event Topup +100", coins: 963, iconColor: "text-[#5bc8ff]" },
+    { label: "86 Diamonds", price: 24500, oldPrice: 26000, desc: "78 + 8 bonus", coins: 245, iconColor: "text-[#5bc8ff]" },
+    { label: "172 Diamonds", price: 48500, oldPrice: 51000, desc: "156 + 16 bonus", coins: 485, iconColor: "text-[#5bc8ff]" },
     { label: "296 Diamonds", price: 93017, oldPrice: 98000, desc: "256 + 40 bonus", coins: 930, iconColor: "text-[#5bc8ff]" },
     { label: "345 Diamonds", price: 101651, oldPrice: 106790, desc: "301 + 44 bonus", coins: 1016, iconColor: "text-[#5bc8ff]" },
-    { label: "86 Diamonds", price: 24500, oldPrice: 26000, desc: "78 + 8 bonus", coins: 245, iconColor: "text-[#5bc8ff]" },
-    { label: "Twilight Pass", price: 149000, oldPrice: 159000, desc: "Skin + 500 diamond", coins: 1490, iconColor: "text-[#c07bff]" },
+    { label: "706 Diamonds", price: 220000, oldPrice: 233000, desc: "636 + 70 bonus", coins: 2200, iconColor: "text-[#5bc8ff]" },
+    { label: "2195 Diamonds", price: 645000, oldPrice: 680000, desc: "2010 + 185 bonus", coins: 6450, iconColor: "text-[#5bc8ff]" },
+    { label: "Twilight Pass", price: 149000, oldPrice: 159000, desc: "Skin + 500 diamond", coins: 1490, iconColor: "text-[#c07bff]", badge: "EVENT" },
   ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },

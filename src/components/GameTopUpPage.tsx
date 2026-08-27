@@ -161,7 +161,7 @@ export default function GameTopUpPage({ config, iconKind = "diamond" as "diamond
       </main>
 
       <MobileStickyBar total={total} />
-      <div className="mt-10">
+      <div className="mt-10 hidden lg:block">
         <Footer />
       </div>
     </>

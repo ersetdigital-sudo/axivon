@@ -27,7 +27,10 @@ const config: GameTopUpConfig = {
     { label: "980 + 110 Genesis", price: 249000, oldPrice: 265000, desc: "Bonus 110 crystal", coins: 1090, iconColor: "text-[#5bc8ff]" },
     { label: "1980 + 260 Genesis", price: 479000, oldPrice: 510000, desc: "Bonus 260 crystal", coins: 2240, iconColor: "text-[#5bc8ff]" },
     { label: "3280 + 600 Genesis", price: 799000, oldPrice: 845000, desc: "Bonus 600 crystal", coins: 3880, iconColor: "text-[#5bc8ff]" },
-    { label: "Welkin Moon", price: 79000, oldPrice: 85000, desc: "90 crystal harian 30 hari", coins: 2790, iconColor: "text-[#c07bff]", badge: "BEST" },
+    { label: "6480 + 1600 Genesis", price: 1599000, oldPrice: 1690000, desc: "Bonus 1600 crystal", coins: 8080, iconColor: "text-[#5bc8ff]" },
+    { label: "12960 + 3200 Genesis", price: 3199000, oldPrice: 3380000, desc: "Bonus 3200 crystal", coins: 16160, iconColor: "text-[#5bc8ff]" },
+    { label: "Welkin Moon", price: 79000, oldPrice: 85000, desc: "90 crystal harian 30 hari", coins: 2790, iconColor: "text-[#c07bff]" },
+    { label: "Genesis Crystals + BP", price: 189000, oldPrice: 215000, desc: "Crystal + Battle Pass", coins: 1890, iconColor: "text-[#c07bff]", badge: "BEST" },
   ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
