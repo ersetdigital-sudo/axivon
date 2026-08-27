@@ -34,6 +34,18 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
     <>
       <Header />
       <main className="max-w-2xl mx-auto px-4 sm:px-5 py-8 md:py-10 pb-24">
+        {/* DEBUG: payment method lookup diagnostic */}
+        <pre className="text-[10px] text-[#6d7681] mb-4 p-2 bg-[#0d0f12] border border-[#262b33] rounded overflow-x-auto">
+{JSON.stringify({
+  code,
+  status: order.status,
+  payment_method: order.payment_method,
+  methods: paymentMethods?.map((m: any) => m.label),
+  pmFound: !!pm,
+  pmType: pm?.type,
+  pmQR: pm?.qris_image_url?.slice(0, 40),
+}, null, 2)}
+        </pre>
         <div className="text-center">
           <div className={`mx-auto w-16 h-16 rounded-2xl grid place-items-center shadow-lg ${
             isPaid ? "bg-gradient-to-br from-[#2fbf71] to-[#5ed98f] shadow-[#2fbf71]/30" :
