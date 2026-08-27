@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { createOrderAction } from "@/app/actions";
 
 export interface NominalItem {
   label: string;
@@ -89,6 +90,7 @@ export default function GameTopUpPage({ config, iconKind = "diamond" as "diamond
   const [showWarn, setShowWarn] = useState(false);
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [whatsapp, setWhatsapp] = useState("");
   const setField = (id: string, v: string) => setFieldValues((p) => ({ ...p, [id]: v }));
 
   const nom = config.nominals[selectedNominal];
@@ -101,9 +103,13 @@ export default function GameTopUpPage({ config, iconKind = "diamond" as "diamond
 
   const allFilled = config.accountFields.every((f) => fieldValues[f.id]?.trim());
 
-  const handleBuy = () => {
-    if (!allFilled) setShowWarn(true);
-    else setShowWarn(false);
+  const handleBuy = (e: React.FormEvent) => {
+    if (!allFilled) {
+      e.preventDefault();
+      setShowWarn(true);
+    } else {
+      setShowWarn(false);
+    }
   };
 
   return (
@@ -148,13 +154,16 @@ export default function GameTopUpPage({ config, iconKind = "diamond" as "diamond
               iconKind={iconKind} iconColor={config.nominalIconColor}
             />
 
-            <Step2Account fields={config.accountFields} values={fieldValues} setField={setField} help={config.accountHelp} />
+            <Step2Account fields={config.accountFields} values={fieldValues} setField={setField} help={config.accountHelp} whatsapp={whatsapp} setWhatsapp={setWhatsapp} />
 
             <Step3Payment payments={config.payments} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} />
 
             <SummaryPanel
               nom={nom} pay={pay} total={total} account={account}
               showWarn={showWarn} allFilled={allFilled} handleBuy={handleBuy}
+              gameSlug={config.slug.replace("/", "")} customerUid={fieldValues.uid || fieldValues.playerId || ""}
+              customerZid={fieldValues.zid || fieldValues.server || ""}
+              customerWhatsapp={whatsapp}
             />
           </div>
         </div>
@@ -368,9 +377,10 @@ function Step1Nominal({ ntabs, activeNtab, setActiveNtab, nominals, selectedNomi
   );
 }
 
-function Step2Account({ fields, values, setField, help }: {
+function Step2Account({ fields, values, setField, help, whatsapp, setWhatsapp }: {
   fields: GameTopUpConfig["accountFields"]; values: Record<string, string>;
   setField: (id: string, v: string) => void; help: ReactNode;
+  whatsapp: string; setWhatsapp: (v: string) => void;
 }) {
   const gridCols = fields.length === 1 ? "grid-cols-1" : fields.length === 2 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-3";
   return (
@@ -387,6 +397,11 @@ function Step2Account({ fields, values, setField, help }: {
               className="mt-1.5 w-full rounded-lg px-3.5 py-3 text-sm placeholder:text-[#5d6570] bg-[#12151a] border border-[#262b33] focus:outline-none focus:border-[#ff5c2b]" />
           </div>
         ))}
+        <div>
+          <label className="text-xs font-semibold text-[#9aa3ad]">WhatsApp <span className="text-[#6d7681] font-normal">(opsional)</span></label>
+          <input type="tel" inputMode="numeric" placeholder="6281234567890" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+            className="mt-1.5 w-full rounded-lg px-3.5 py-3 text-sm placeholder:text-[#5d6570] bg-[#12151a] border border-[#262b33] focus:outline-none focus:border-[#ff5c2b]" />
+        </div>
       </div>
       <p className="mt-3 text-xs text-[#9aa3ad]">{help}</p>
     </section>
@@ -421,9 +436,10 @@ function Step3Payment({ payments, selectedPayment, setSelectedPayment }: {
   );
 }
 
-function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy }: {
+function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy, gameSlug, customerUid, customerZid, customerWhatsapp }: {
   nom: NominalItem; pay: PaymentItem; total: number; account: string;
-  showWarn: boolean; allFilled: boolean; handleBuy: () => void;
+  showWarn: boolean; allFilled: boolean; handleBuy: (e: React.FormEvent) => void;
+  gameSlug: string; customerUid: string; customerZid: string; customerWhatsapp: string;
 }) {
   return (
     <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
@@ -435,16 +451,25 @@ function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy
         <div className="flex justify-between gap-4"><dt className="text-[#9aa3ad]">Harga</dt><dd className="font-semibold text-right">{rupiah(nom.price)}</dd></div>
         <div className="flex justify-between gap-4"><dt className="text-[#9aa3ad]">Biaya layanan</dt><dd className="font-semibold text-right">{rupiah(pay.fee)}</dd></div>
       </dl>
-      <div className="mt-4 pt-4 border-t border-[#262b33] flex items-end justify-between gap-4 flex-wrap">
+      <form action={createOrderAction} onSubmit={handleBuy} className="mt-4 pt-4 border-t border-[#262b33] flex items-end justify-between gap-4 flex-wrap">
+        <input type="hidden" name="game_slug" value={gameSlug} />
+        <input type="hidden" name="product_label" value={nom.label} />
+        <input type="hidden" name="product_price" value={nom.price} />
+        <input type="hidden" name="product_old_price" value={nom.oldPrice} />
+        <input type="hidden" name="payment_label" value={pay.label} />
+        <input type="hidden" name="payment_fee" value={pay.fee} />
+        <input type="hidden" name="customer_uid" value={customerUid} />
+        <input type="hidden" name="customer_zid" value={customerZid} />
+        <input type="hidden" name="customer_whatsapp" value={customerWhatsapp} />
         <div>
           <div className="text-xs text-[#9aa3ad]">Total bayar</div>
           <div className="text-2xl font-extrabold text-[#ff5c2b]">{rupiah(total)}</div>
         </div>
-        <button onClick={handleBuy} disabled={!allFilled}
+        <button type="submit" disabled={!allFilled}
           className={`px-6 py-3 rounded-lg text-white font-semibold transition ${allFilled ? "bg-[#ff5c2b] hover:bg-[#ff7043]" : "bg-[#3a424e] cursor-not-allowed"}`}>
           Beli Sekarang
         </button>
-      </div>
+      </form>
       {showWarn && <p className="mt-3 text-xs text-[#ffb020]">Lengkapi data akun dulu ya sebelum lanjut bayar.</p>}
     </section>
   );
