@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { getSiteSettings } from "@/lib/site-settings";
 import Header from "@/components/Header";
 import BannerCarousel from "@/components/BannerCarousel";
 import BenefitStrip from "@/components/BenefitStrip";
@@ -67,7 +68,8 @@ const faqJsonLd = {
   ],
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSiteSettings();
   return (
     <>
       <Script
@@ -88,8 +90,8 @@ export default function HomePage() {
       <Pembayaran />
       <Testimoni />
       <FAQ />
-      <CTA />
-      <Footer />
+      <CTA whatsappCs={settings.whatsapp_cs} />
+      <Footer whatsappCs={settings.whatsapp_cs} />
     </>
   );
 }

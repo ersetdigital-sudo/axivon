@@ -38,9 +38,11 @@ type PaymentMethod = {
 export function OrderSuccessView({
   order,
   paymentMethod,
+  whatsappCs,
 }: {
   order: Order;
   paymentMethod: PaymentMethod | undefined;
+  whatsappCs: string;
 }) {
   const isPaid = order.status === "paid" || order.status === "success";
   const isPending = order.status === "pending";
@@ -53,12 +55,12 @@ export function OrderSuccessView({
         <Hero order={order} isPaid={isPaid} isPending={isPending} isFailed={isFailed} />
         <OrderTimeline order={order} isPaid={isPaid} isPending={isPending} isFailed={isFailed} />
         {isPending && paymentMethod && (
-          <PaymentInstructions order={order} pm={paymentMethod} />
+          <PaymentInstructions order={order} pm={paymentMethod} whatsappCs={whatsappCs} />
         )}
         {isPaid && <PaidNextSteps order={order} />}
       </main>
       {isPending && paymentMethod && (
-        <StickyActionBar order={order} pm={paymentMethod} />
+        <StickyActionBar order={order} pm={paymentMethod} whatsappCs={whatsappCs} />
       )}
       <div className="hidden lg:block">
         <Footer />
@@ -207,7 +209,7 @@ function DetailRow({ label, value, mono, accent }: { label: string; value: strin
   );
 }
 
-function PaymentInstructions({ order, pm }: { order: Order; pm: PaymentMethod }) {
+function PaymentInstructions({ order, pm, whatsappCs }: { order: Order; pm: PaymentMethod; whatsappCs: string }) {
   return (
     <section className="mt-5 slide-up slide-up-d2">
       <div className="bg-[#171a1f] border border-[#ff5c2b]/30 rounded-2xl overflow-hidden">
@@ -283,7 +285,7 @@ function PaymentInstructions({ order, pm }: { order: Order; pm: PaymentMethod })
 
             <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#262b33]">
               <a
-                href={`https://wa.me/6281234567890?text=Halo%20Admin%2C%20saya%20butuh%20bantuan%20order%20${order.order_code}`}
+                href={`https://wa.me/${whatsappCs}?text=Halo%20Admin%2C%20saya%20butuh%20bantuan%20order%20${order.order_code}`}
                 target="_blank"
                 rel="noopener"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2fbf71]/10 border border-[#2fbf71]/30 text-[#2fbf71] text-xs font-bold hover:bg-[#2fbf71]/20 transition"
@@ -368,13 +370,13 @@ function PaidNextSteps({ order }: { order: Order }) {
   );
 }
 
-function StickyActionBar({ order, pm }: { order: Order; pm: PaymentMethod }) {
+function StickyActionBar({ order, pm, whatsappCs }: { order: Order; pm: PaymentMethod; whatsappCs: string }) {
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#101215] via-[#101215]/95 to-transparent pt-6 pb-4 px-4 sm:hidden">
         <div className="max-w-3xl mx-auto flex items-center gap-2">
           <a
-            href={`https://wa.me/6281234567890?text=Halo%2C%20saya%20sudah%20bayar%20${order.order_code}`}
+            href={`https://wa.me/${whatsappCs}?text=Halo%2C%20saya%20sudah%20bayar%20${order.order_code}`}
             target="_blank"
             rel="noopener"
             className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2fbf71] text-white text-sm font-bold shadow-lg shadow-[#2fbf71]/30 hover:shadow-xl transition"

@@ -8,7 +8,7 @@ export async function requireStaff() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, full_name, email")
+    .select("id, role, full_name, email")
     .eq("id", user.id)
     .single();
 

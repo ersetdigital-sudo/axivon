@@ -3,12 +3,13 @@ import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
-const STATIC: Omit<GameTopUpConfig, "nominals" | "payments"> = {
+const STATIC: Omit<GameTopUpConfig, "nominals" | "payments" | "whatsappCs"> = {
   slug: "/mobile-legends",
   name: "Mobile Legends: Bang Bang",
   shortName: "Mobile Legends",
@@ -61,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MobileLegendsPage() {
   const admin = createSupabaseAdminClient();
-  const [{ data: prods }, payments] = await Promise.all([
+  const [{ data: prods }, payments, settings] = await Promise.all([
     admin
       .from("products")
       .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
@@ -69,6 +70,7 @@ export default async function MobileLegendsPage() {
       .eq("is_active", true)
       .order("sort_order"),
     loadActivePaymentMethods(),
+    getSiteSettings(),
   ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
@@ -122,7 +124,7 @@ export default async function MobileLegendsPage() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <GameTopUpPage config={{ ...STATIC, nominals, payments }} />
+      <GameTopUpPage config={{ ...STATIC, nominals, payments, whatsappCs: settings.whatsapp_cs }} />
     </>
   );
 }

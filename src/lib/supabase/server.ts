@@ -31,3 +31,7 @@ export function createSupabaseAdminClient() {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 }
+
+export async function getSupabaseAdmin() {
+  return createSupabaseAdminClient();
+}

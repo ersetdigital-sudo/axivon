@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Footer() {
+type Props = { whatsappCs?: string };
+
+export default function Footer({ whatsappCs }: Props = {}) {
+  const wa = whatsappCs || "6281234567890";
   return (
     <footer className="border-t border-[#262b33] bg-[#0d0f12]">
       <div className="mx-auto max-w-7xl px-4 sm:px-5 py-12 grid gap-10 md:grid-cols-4">
@@ -34,7 +37,7 @@ export default function Footer() {
             <li><Link href="#faq" className="hover:text-white transition">FAQ</Link></li>
             <li><Link href="#cara" className="hover:text-white transition">Cara Top Up</Link></li>
             <li><a href="mailto:halo@axivongames.net" className="hover:text-white transition">halo@axivongames.net</a></li>
-            <li><a href="https://wa.me/6281234567890" className="hover:text-white transition">WhatsApp CS</a></li>
+            <li><a href={`https://wa.me/${wa}`} className="hover:text-white transition">WhatsApp CS</a></li>
           </ul>
         </div>
       </div>

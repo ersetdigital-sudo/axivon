@@ -42,6 +42,7 @@ export interface GameTopUpConfig {
   payments: PaymentItem[];
   regionNote?: string;
   howToSteps: string[];
+  whatsappCs: string;
 }
 
 const rupiah = (n: number) => "Rp" + n.toLocaleString("id-ID");
@@ -136,7 +137,7 @@ export default function GameTopUpPage({ config, iconKind = "diamond" as "diamond
           <aside className="hidden lg:block lg:sticky lg:top-24 space-y-4 w-full">
             <GameInfoCard config={config} />
             <HowToTopUp steps={config.howToSteps} name={config.shortName} />
-            <HelpCard />
+            <HelpCard whatsappCs={config.whatsappCs} />
           </aside>
 
           <div className="w-full min-w-0 space-y-4">
@@ -228,7 +229,7 @@ function HowToTopUp({ steps, name }: { steps: string[]; name: string }) {
   );
 }
 
-function HelpCard() {
+function HelpCard({ whatsappCs }: { whatsappCs: string }) {
   return (
     <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-2 text-sm font-semibold">
@@ -239,7 +240,7 @@ function HelpCard() {
         Butuh bantuan?
       </div>
       <p className="text-sm text-[#9aa3ad] mt-2">CS aktif 08.00–24.00 WIB, rata-rata balas di bawah 3 menit.</p>
-      <a href="https://wa.me/6281234567890" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg bg-[#1c2026] border border-[#262b33] hover:border-[#3a424e] transition">
+      <a href={`https://wa.me/${whatsappCs}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg bg-[#1c2026] border border-[#262b33] hover:border-[#3a424e] transition">
         <svg className="w-4 h-4 text-[#2fbf71]" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.3.3c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 .9c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z" />
         </svg>

@@ -1,6 +1,6 @@
 "use server";
 
-import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient, getSupabaseAdmin } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -268,4 +268,97 @@ export async function uploadPaymentQRISAction(formData: FormData) {
 
   revalidatePath("/admin/payments");
   redirect("/admin/payments?msg=QRIS+berhasil+diupload&toast=ok");
+}
+
+export async function updateSiteSettingsAction(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/admin/login");
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") redirect("/admin?msg=Akses+ditolak&toast=err");
+
+  const admin = createSupabaseAdminClient();
+  const wa = String(formData.get("whatsapp_cs") || "").trim();
+  if (!/^628\d{8,12}$/.test(wa)) redirect("/admin/settings?msg=Format+nomor+WhatsApp+harus+628xxx&toast=err");
+
+  const { error } = await admin.from("site_settings").upsert(
+    { key: "whatsapp_cs", value: JSON.stringify(wa), updated_at: new Date().toISOString(), updated_by: user.id },
+    { onConflict: "key" }
+  );
+  if (error) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal simpan: " + error.message)}&toast=err`);
+
+  revalidatePath("/admin/settings");
+  revalidatePath("/", "layout");
+  redirect("/admin/settings?msg=Pengaturan+berhasil+disimpan&toast=ok");
+}
+
+export async function updateOwnProfileAction(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/admin/login");
+
+  const fullName = String(formData.get("full_name") || "").trim();
+  const newPassword = String(formData.get("new_password") || "");
+
+  const admin = await getSupabaseAdmin();
+  const { error: profileError } = await admin
+    .from("profiles")
+    .update({ full_name: fullName, email: user.email })
+    .eq("id", user.id);
+  if (profileError) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal update profil: " + profileError.message)}&toast=err`);
+
+  if (newPassword && newPassword.length >= 6) {
+    const { error: pwError } = await admin.auth.admin.updateUserById(user.id, { password: newPassword });
+    if (pwError) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal ganti password: " + pwError.message)}&toast=err`);
+  }
+
+  revalidatePath("/admin/settings");
+  redirect(`/admin/settings?msg=Profil+berhasil+diperbarui${newPassword ? "+dan+password" : ""}&toast=ok`);
+}
+
+export async function createAdminAction(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/admin/login");
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") redirect("/admin?msg=Akses+ditolak&toast=err");
+
+  const email = String(formData.get("email") || "").trim();
+  const password = String(formData.get("password") || "");
+  const fullName = String(formData.get("full_name") || "").trim();
+
+  if (!email || !password || password.length < 6) redirect("/admin/admins?msg=Email+dan+password+(min+6+char)+wajib&toast=err");
+
+  const admin = await getSupabaseAdmin();
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+  if (error) redirect(`/admin/admins?msg=${encodeURIComponent("Gagal buat admin: " + error.message)}&toast=err`);
+
+  if (created?.user) {
+    await admin.from("profiles").update({ full_name: fullName, role: "admin" }).eq("id", created.user.id);
+  }
+  revalidatePath("/admin/admins");
+  redirect("/admin/admins?msg=Admin+berhasil+ditambahkan&toast=ok");
+}
+
+export async function deleteAdminAction(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/admin/login");
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") redirect("/admin?msg=Akses+ditolak&toast=err");
+
+  const targetId = String(formData.get("id") || "");
+  if (targetId === user.id) redirect("/admin/admins?msg=Tidak+bisa+hapus+akun+sendiri&toast=err");
+
+  const admin = await getSupabaseAdmin();
+  const { error } = await admin.auth.admin.deleteUser(targetId);
+  if (error) redirect(`/admin/admins?msg=${encodeURIComponent("Gagal hapus: " + error.message)}&toast=err`);
+
+  revalidatePath("/admin/admins");
+  redirect("/admin/admins?msg=Admin+berhasil+dihapus&toast=ok");
 }

@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
 import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
+import { getSiteSettings } from "@/lib/site-settings";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
-const STATIC: Omit<GameTopUpConfig, "nominals" | "payments"> = {
+const STATIC: Omit<GameTopUpConfig, "nominals" | "payments" | "whatsappCs"> = {
   slug: "/magic-chess",
   name: "Magic Chess: Go Go",
   shortName: "Magic Chess",
@@ -52,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MagicChessPage() {
   const admin = createSupabaseAdminClient();
-  const [{ data: prods }, payments] = await Promise.all([
+  const [{ data: prods }, payments, settings] = await Promise.all([
     admin
       .from("products")
       .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
@@ -60,6 +61,7 @@ export default async function MagicChessPage() {
       .eq("is_active", true)
       .order("sort_order"),
     loadActivePaymentMethods(),
+    getSiteSettings(),
   ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
@@ -102,7 +104,7 @@ export default async function MagicChessPage() {
     <>
       <Script id="ld-product-mc" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <Script id="ld-breadcrumb-mc" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <GameTopUpPage config={{ ...STATIC, nominals, payments }} iconKind="diamond" />
+      <GameTopUpPage config={{ ...STATIC, nominals, payments, whatsappCs: settings.whatsapp_cs }} iconKind="diamond" />
     </>
   );
 }

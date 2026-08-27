@@ -1,17 +1,22 @@
 import { notFound } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { OrderSuccessView } from "@/components/OrderSuccessView";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const rupiah = (n: number) => "Rp" + n.toLocaleString("id-ID");
 
 export default async function OrderPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const supabase = createSupabaseAdminClient();
-  const { data: order } = await supabase
-    .from("orders")
-    .select("order_code, status, total, subtotal, service_fee, payment_method, customer_uid, customer_zid, customer_whatsapp, notes, created_at, games(slug, name), products(label, coins)")
-    .eq("order_code", code)
-    .single();
+  const [orderRes, settings] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("order_code, status, total, subtotal, service_fee, payment_method, customer_uid, customer_zid, customer_whatsapp, notes, created_at, games(slug, name), products(label, coins)")
+      .eq("order_code", code)
+      .single(),
+    getSiteSettings(),
+  ]);
+  const order = orderRes.data;
 
   if (!order) notFound();
 
@@ -21,5 +26,11 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
     .eq("is_active", true);
   const pm = (paymentMethods || []).find((m: any) => m.label === order.payment_method);
 
-  return <OrderSuccessView order={order as any} paymentMethod={pm as any} />;
+  return (
+    <OrderSuccessView
+      order={order as any}
+      paymentMethod={pm as any}
+      whatsappCs={settings.whatsapp_cs}
+    />
+  );
 }

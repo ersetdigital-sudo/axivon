@@ -1,4 +1,7 @@
-export default function CTA() {
+type Props = { whatsappCs?: string };
+
+export default function CTA({ whatsappCs }: Props = {}) {
+  const wa = whatsappCs || "6281234567890";
   return (
     <section id="cek" className="mx-auto max-w-7xl px-4 sm:px-5 pb-16 md:pb-20">
       <div className="bg-[#171a1f] border border-[#262b33] rounded-xl p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -11,7 +14,7 @@ export default function CTA() {
             Mulai Top Up
           </a>
           <a
-            href="https://wa.me/6281234567890"
+            href={`https://wa.me/${wa}`}
             className="px-6 py-3 rounded-lg bg-[#1c2026] border border-[#262b33] font-semibold hover:border-[#3a424e] transition inline-flex items-center gap-2"
           >
             <svg className="w-4 h-4 text-[#2fbf71]" viewBox="0 0 24 24" fill="currentColor">
