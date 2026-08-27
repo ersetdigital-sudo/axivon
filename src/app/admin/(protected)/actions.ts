@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(_prev: { error?: string } | undefined, formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   if (!email || !password) return { error: "Email & password wajib diisi." };
