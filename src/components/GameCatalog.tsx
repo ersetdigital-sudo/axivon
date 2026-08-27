@@ -6,11 +6,11 @@ import Link from "next/link";
 
 const games = [
   { name: "Mobile Legends", slug: "/mobile-legends", cat: "mobile", price: "mulai Rp 3.500", badge: "-12%", badgeColor: "bg-[#ff5c2b] text-white", img: "/images/8f47dd26-4142-498f-a61c-14f17dc5cd18.png", search: "mobile legends mlbb diamond" },
-  { name: "PUBG Mobile", slug: "#", cat: "mobile", price: "mulai Rp 14.000", badge: "-5%", badgeColor: "bg-[#ff5c2b] text-white", img: "/images/517d8ae9-25a3-412d-ac02-fda4eea809ac.png", search: "pubg mobile uc" },
-  { name: "Free Fire", slug: "#", cat: "mobile", price: "mulai Rp 2.900", badge: "TERLARIS", badgeColor: "bg-[#ffb020] text-[#101215]", img: "/images/068b552d-43d8-45eb-8ea5-420aac595ef2.png", search: "free fire ff diamond" },
-  { name: "Magic Chess", slug: "#", cat: "baru", price: "mulai Rp 5.000", badge: "BARU", badgeColor: "bg-[#2fbf71] text-[#101215]", img: "/images/9d357c22-da08-4270-9750-efeb7890bc0e.png", search: "magic chess go go" },
-  { name: "COD Mobile", slug: "#", cat: "mobile", price: "mulai Rp 12.000", badge: "-6%", badgeColor: "bg-[#ff5c2b] text-white", img: "/images/bae33449-55c9-489e-b7de-16530bdaca12.png", search: "call of duty cod mobile" },
-  { name: "Genshin Impact", slug: "#", cat: "pc", price: "mulai Rp 16.000", badge: "TERLARIS", badgeColor: "bg-[#ffb020] text-[#101215]", img: "/images/dd9c2680-f65c-41a5-a7f9-6e9338c893e7.png", search: "genshin impact genesis crystal" },
+  { name: "PUBG Mobile", slug: "/pubg-mobile", cat: "mobile", price: "mulai Rp 14.000", badge: "-5%", badgeColor: "bg-[#ff5c2b] text-white", img: "/images/517d8ae9-25a3-412d-ac02-fda4eea809ac.png", search: "pubg mobile uc" },
+  { name: "Free Fire", slug: "/free-fire", cat: "mobile", price: "mulai Rp 2.900", badge: "TERLARIS", badgeColor: "bg-[#ffb020] text-[#101215]", img: "/images/068b552d-43d8-45eb-8ea5-420aac595ef2.png", search: "free fire ff diamond" },
+  { name: "Magic Chess", slug: "/magic-chess", cat: "baru", price: "mulai Rp 5.000", badge: "BARU", badgeColor: "bg-[#2fbf71] text-[#101215]", img: "/images/9d357c22-da08-4270-9750-efeb7890bc0e.png", search: "magic chess go go" },
+  { name: "COD Mobile", slug: "/cod-mobile", cat: "mobile", price: "mulai Rp 12.000", badge: "-6%", badgeColor: "bg-[#ff5c2b] text-white", img: "/images/bae33449-55c9-489e-b7de-16530bdaca12.png", search: "call of duty cod mobile" },
+  { name: "Genshin Impact", slug: "/genshin-impact", cat: "pc", price: "mulai Rp 16.000", badge: "TERLARIS", badgeColor: "bg-[#ffb020] text-[#101215]", img: "/images/dd9c2680-f65c-41a5-a7f9-6e9338c893e7.png", search: "genshin impact genesis crystal" },
 ];
 
 const tabList = [
