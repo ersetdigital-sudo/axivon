@@ -2,6 +2,7 @@ import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { updateSiteSettingsAction, updateOwnProfileAction } from "../actions";
+import { SettingsForm } from "@/components/admin/SettingsForm";
 
 export default async function AdminSettingsPage({ searchParams }: { searchParams: Promise<{ msg?: string; toast?: string }> }) {
   const { profile } = await requireStaff();
@@ -38,24 +39,20 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           <p className="text-xs text-[#9aa3ad] mt-1 leading-relaxed">
             Nomor ini otomatis ke-reflect di landing page, footer, halaman game, dan thank-you page. Format: <span className="font-mono text-white">628xxxxxxxxx</span> (kode negara 62 + nomor HP, tanpa + atau 0 di depan).
           </p>
-          <form action={updateSiteSettingsAction} className="mt-4 flex flex-col sm:flex-row gap-2">
-            <input
-              type="tel"
-              name="whatsapp_cs"
-              defaultValue={whatsappCs}
-              placeholder="6281234567890"
-              pattern="628[0-9]{8,12}"
-              className="form-input flex-1 font-mono"
-              required
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#ff5c2b] to-[#ff7a3f] text-white text-xs font-bold hover:shadow-lg hover:shadow-[#ff5c2b]/30 transition"
-            >
-              Simpan
-            </button>
-          </form>
-          <div className="mt-2 text-[10px] text-[#6d7681]">Current: <span className="font-mono text-[#9aa3ad]">{whatsappCs}</span> · akan muncul di semua halaman</div>
+          <SettingsForm action={updateSiteSettingsAction} buttonLabel="Simpan">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="tel"
+                name="whatsapp_cs"
+                defaultValue={whatsappCs}
+                placeholder="6281234567890"
+                pattern="628[0-9]{8,12}"
+                className="form-input flex-1 font-mono"
+                required
+              />
+            </div>
+            <div className="mt-2 text-[10px] text-[#6d7681]">Current: <span className="font-mono text-[#9aa3ad]">{whatsappCs}</span> · akan muncul di semua halaman</div>
+          </SettingsForm>
         </section>
 
         <section className="bg-[#171a1f] border border-[#262b33] rounded-2xl p-5">
@@ -67,7 +64,7 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             Profil & Password
           </h2>
           <p className="text-xs text-[#9aa3ad] mt-1 leading-relaxed">Update nama tampil + ganti password. Kosongkan password jika tidak ingin ganti.</p>
-          <form action={updateOwnProfileAction} className="mt-4 space-y-3">
+          <SettingsForm action={updateOwnProfileAction} buttonLabel="Simpan Profil">
             <div>
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-[#6d7681]">Email</label>
               <input value={profile.email} disabled className="form-input bg-[#0a0c0f] text-[#6d7681] cursor-not-allowed" />
@@ -92,13 +89,7 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
                 autoComplete="new-password"
               />
             </div>
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#ff5c2b] to-[#ff7a3f] text-white text-xs font-bold hover:shadow-lg hover:shadow-[#ff5c2b]/30 transition"
-            >
-              Simpan Profil
-            </button>
-          </form>
+          </SettingsForm>
         </section>
       </div>
     </AdminShell>

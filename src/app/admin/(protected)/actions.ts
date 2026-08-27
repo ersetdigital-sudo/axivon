@@ -273,29 +273,29 @@ export async function uploadPaymentQRISAction(formData: FormData) {
 export async function updateSiteSettingsAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  if (!user) return { ok: false, message: "Tidak terautentikasi" };
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") redirect("/admin?msg=Akses+ditolak&toast=err");
+  if (profile?.role !== "admin") return { ok: false, message: "Akses ditolak" };
 
   const admin = createSupabaseAdminClient();
   const wa = String(formData.get("whatsapp_cs") || "").trim();
-  if (!/^628\d{8,12}$/.test(wa)) redirect("/admin/settings?msg=Format+nomor+WhatsApp+harus+628xxx&toast=err");
+  if (!/^628\d{8,12}$/.test(wa)) return { ok: false, message: "Format nomor WhatsApp harus 628xxx (10-13 digit)" };
 
   const { error } = await admin.from("site_settings").upsert(
     { key: "whatsapp_cs", value: JSON.stringify(wa), updated_at: new Date().toISOString(), updated_by: user.id },
     { onConflict: "key" }
   );
-  if (error) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal simpan: " + error.message)}&toast=err`);
+  if (error) return { ok: false, message: "Gagal simpan: " + error.message };
 
   revalidatePath("/admin/settings");
   revalidatePath("/", "layout");
-  redirect("/admin/settings?msg=Pengaturan+berhasil+disimpan&toast=ok");
+  return { ok: true, message: "Pengaturan berhasil disimpan" };
 }
 
 export async function updateOwnProfileAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  if (!user) return { ok: false, message: "Tidak terautentikasi" };
 
   const fullName = String(formData.get("full_name") || "").trim();
   const newPassword = String(formData.get("new_password") || "");
@@ -305,29 +305,31 @@ export async function updateOwnProfileAction(formData: FormData) {
     .from("profiles")
     .update({ full_name: fullName, email: user.email })
     .eq("id", user.id);
-  if (profileError) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal update profil: " + profileError.message)}&toast=err`);
+  if (profileError) return { ok: false, message: "Gagal update profil: " + profileError.message };
 
   if (newPassword && newPassword.length >= 6) {
     const { error: pwError } = await admin.auth.admin.updateUserById(user.id, { password: newPassword });
-    if (pwError) redirect(`/admin/settings?msg=${encodeURIComponent("Gagal ganti password: " + pwError.message)}&toast=err`);
+    if (pwError) return { ok: false, message: "Gagal ganti password: " + pwError.message };
   }
 
   revalidatePath("/admin/settings");
-  redirect(`/admin/settings?msg=Profil+berhasil+diperbarui${newPassword ? "+dan+password" : ""}&toast=ok`);
+  return { ok: true, message: "Profil berhasil diperbarui" + (newPassword ? " dan password" : "") };
 }
 
 export async function createAdminAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  if (!user) return { ok: false, message: "Tidak terautentikasi" };
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") redirect("/admin?msg=Akses+ditolak&toast=err");
+  if (profile?.role !== "admin") return { ok: false, message: "Akses ditolak" };
 
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
   const fullName = String(formData.get("full_name") || "").trim();
 
-  if (!email || !password || password.length < 6) redirect("/admin/admins?msg=Email+dan+password+(min+6+char)+wajib&toast=err");
+  if (!email || !password || password.length < 6) {
+    return { ok: false, message: "Email dan password (min 6 char) wajib diisi" };
+  }
 
   const admin = await getSupabaseAdmin();
   const { data: created, error } = await admin.auth.admin.createUser({
@@ -336,13 +338,18 @@ export async function createAdminAction(formData: FormData) {
     email_confirm: true,
     user_metadata: { full_name: fullName },
   });
-  if (error) redirect(`/admin/admins?msg=${encodeURIComponent("Gagal buat admin: " + error.message)}&toast=err`);
+  if (error) {
+    if (error.message.toLowerCase().includes("already")) {
+      return { ok: false, message: "Email ini sudah terdaftar sebagai admin/user lain" };
+    }
+    return { ok: false, message: "Gagal buat admin: " + error.message };
+  }
 
   if (created?.user) {
     await admin.from("profiles").update({ full_name: fullName, role: "admin" }).eq("id", created.user.id);
   }
   revalidatePath("/admin/admins");
-  redirect("/admin/admins?msg=Admin+berhasil+ditambahkan&toast=ok");
+  return { ok: true, message: "Admin " + email + " berhasil ditambahkan" };
 }
 
 export async function deleteAdminAction(formData: FormData) {
