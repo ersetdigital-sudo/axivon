@@ -61,6 +61,33 @@ details[open] .chev { transform: rotate(180deg); }
 .field { background: #12151a; border: 1px solid var(--line); }
 .field:focus { outline: none; border-color: var(--accent); }
 
+.form-input {
+  width: 100%;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  background: #0d0f12;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.form-input::placeholder { color: #4d5560; }
+.form-input:hover { border-color: #3a424e; }
+.form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,92,43,0.15); background: #12151a; }
+.form-input[type="file"] { padding: 0.5rem; }
+
+.form-select {
+  width: 100%;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  background: #0d0f12;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.form-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,92,43,0.15); }
+
 .step-no { background: var(--accent); color: #fff; }
 
 .tab-active { background: var(--ink); color: #101215; }
