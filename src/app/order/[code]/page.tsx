@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
@@ -17,21 +18,36 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
 
   if (!order) notFound();
 
+  // Find matching payment method detail
+  const { data: paymentMethods } = await supabase
+    .from("payment_methods")
+    .select("label, type, account_number, account_name, bank_name, qris_image_url, instructions, fee_label, whatsapp_cs, account_number")
+    .eq("is_active", true);
+  const pm = (paymentMethods || []).find((m: any) => m.label === order.payment_method);
+
   const isPending = order.status === "pending";
   const isPaid = order.status === "paid" || order.status === "success";
 
   return (
     <>
       <Header />
-      <main className="max-w-2xl mx-auto px-4 sm:px-5 py-10 pb-24">
+      <main className="max-w-2xl mx-auto px-4 sm:px-5 py-8 md:py-10 pb-24">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2fbf71] to-[#5ed98f] grid place-items-center shadow-lg shadow-[#2fbf71]/30">
+          <div className={`mx-auto w-16 h-16 rounded-2xl grid place-items-center shadow-lg ${
+            isPaid ? "bg-gradient-to-br from-[#2fbf71] to-[#5ed98f] shadow-[#2fbf71]/30" :
+            isPending ? "bg-gradient-to-br from-[#ffb020] to-[#ffcb54] shadow-[#ffb020]/30" :
+            "bg-gradient-to-br from-[#6d7681] to-[#9aa3ad]"
+          }`}>
             <svg className="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m5 12.5 4.5 4.5L19 7" />
+              {isPaid ? <path d="m5 12.5 4.5 4.5L19 7" /> : <path d="M12 8v5M12 16h.01" />}
             </svg>
           </div>
-          <h1 className="mt-5 text-2xl md:text-3xl font-extrabold">Order Berhasil Dibuat!</h1>
-          <p className="text-sm text-[#9aa3ad] mt-2">Selesaikan pembayaran supaya item kamu langsung diproses.</p>
+          <h1 className="mt-5 text-2xl md:text-3xl font-extrabold">
+            {isPaid ? "Pembayaran Berhasil!" : "Order Berhasil Dibuat!"}
+          </h1>
+          <p className="text-sm text-[#9aa3ad] mt-2">
+            {isPaid ? "Item kamu sudah masuk ke akun." : "Selesaikan pembayaran supaya item kamu langsung diproses."}
+          </p>
         </div>
 
         <div className="mt-8 bg-[#171a1f] border border-[#262b33] rounded-xl p-5">
@@ -54,7 +70,7 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
             <Row label="Item" value={(order as any).products?.label || "—"} />
             {(order as any).products?.coins && <Row label="Item diterima" value={`${(order as any).products.coins.toLocaleString("id-ID")} koin`} />}
             <Row label="Akun" value={`${order.customer_uid}${order.customer_zid ? ` (${order.customer_zid})` : ""}`} />
-            {order.customer_whatsapp && <Row label="WhatsApp" value={order.customer_whatsapp} />}
+            {order.customer_whatsapp && <Row label="WhatsApp kamu" value={order.customer_whatsapp} />}
             <Row label="Pembayaran" value={order.payment_method} />
           </dl>
 
@@ -68,22 +84,63 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
           </div>
         </div>
 
-        {isPending && (
-          <div className="mt-5 bg-[#20190d] border border-[#4a3a1c] rounded-xl p-5">
-            <div className="flex gap-3">
-              <svg className="w-5 h-5 text-[#ffb020] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        {isPending && pm && (
+          <div className="mt-5 bg-[#171a1f] border border-[#ff5c2b]/30 rounded-xl overflow-hidden">
+            <div className="px-5 py-3 bg-gradient-to-r from-[#ff5c2b]/15 to-transparent border-b border-[#ff5c2b]/20 flex items-center gap-2">
+              <svg className="w-5 h-5 text-[#ff5c2b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 8v5M12 16h.01" />
               </svg>
-              <div className="text-sm">
-                <div className="font-semibold text-[#ffb020]">Cara bayar</div>
-                <p className="text-[#9aa3ad] mt-1.5">
-                  Silakan transfer tepat sebesar <span className="font-bold text-[#eef1f4]">{rupiah(order.total)}</span> ke nomor/virtual account yang dikirim ke WhatsApp kamu (kalau diisi). Konfirmasi otomatis akan diproses setelah pembayaran diterima. Order biasanya selesai dalam &lt; 30 detik.
-                </p>
-                <p className="text-[#9aa3ad] mt-2">
-                  Butuh bantuan? Hubungi CS via WhatsApp:{" "}
-                  <a href="https://wa.me/6281234567890" className="text-[#2fbf71] font-semibold hover:underline">+62 812-3456-7890</a>
-                </p>
+              <h2 className="font-bold text-sm">Cara bayar via {pm.label}</h2>
+              {pm.fee_label && <span className="ml-auto text-[10px] text-[#9aa3ad]">{pm.fee_label}</span>}
+            </div>
+
+            <div className="p-5 grid sm:grid-cols-[200px_1fr] gap-5 items-start">
+              {/* QRIS Image */}
+              {pm.type === "qris" && pm.qris_image_url && (
+                <div className="bg-white rounded-lg p-2 aspect-square flex items-center justify-center overflow-hidden">
+                  <Image src={pm.qris_image_url} alt="QRIS" width={240} height={240} className="w-full h-full object-contain" unoptimized />
+                </div>
+              )}
+
+              <div className="space-y-3 text-sm min-w-0">
+                {pm.instructions && (
+                  <p className="text-[#9aa3ad]">{pm.instructions}</p>
+                )}
+
+                {pm.type === "bank_transfer" && (
+                  <div className="bg-[#0d0f12] rounded-lg p-3 space-y-1.5">
+                    {pm.bank_name && <div className="text-[10px] uppercase tracking-wider text-[#6d7681]">{pm.bank_name}</div>}
+                    <button
+                      onClick={() => {}}
+                      className="font-mono font-bold text-lg text-[#eef1f4] tracking-wide select-all cursor-pointer hover:text-[#ff5c2b] transition w-full text-left"
+                      title="Klik untuk salin"
+                    >
+                      {pm.account_number}
+                    </button>
+                    {pm.account_name && <div className="text-xs text-[#9aa3ad]">a/n {pm.account_name}</div>}
+                  </div>
+                )}
+
+                {pm.type === "ewallet" && (
+                  <div className="bg-[#0d0f12] rounded-lg p-3 space-y-1.5">
+                    <button
+                      className="font-mono font-bold text-base text-[#eef1f4] tracking-wide select-all cursor-pointer hover:text-[#ff5c2b] transition w-full text-left"
+                      title="Klik untuk salin"
+                    >
+                      {pm.account_number}
+                    </button>
+                    {pm.account_name && <div className="text-xs text-[#9aa3ad]">a/n {pm.account_name}</div>}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-[#262b33]">
+                  <a href={`https://wa.me/${(pm as any).account_number || "6281234567890"}`} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2fbf71] hover:underline">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.3.3c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 .9c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z" /></svg>
+                    Konfirmasi via WhatsApp
+                  </a>
+                  <span className="text-xs text-[#6d7681]">Order biasanya selesai &lt; 30 detik setelah bayar.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -91,7 +148,7 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
 
         <div className="mt-6 flex flex-wrap gap-2 justify-center">
           <Link href="/" className="px-5 py-2.5 rounded-lg bg-[#1c2026] border border-[#262b33] text-sm font-semibold hover:border-[#3a424e] transition">
-            ← Kembali ke Beranda
+            ← Beranda
           </Link>
           <Link href="/mobile-legends" className="px-5 py-2.5 rounded-lg bg-[#ff5c2b] text-white text-sm font-semibold hover:bg-[#ff7043] transition">
             Top Up Lagi

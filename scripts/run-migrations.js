@@ -28,9 +28,9 @@ async function runMigration(file) {
 
 (async () => {
   try {
-    await runMigration('0001_init.sql');
-    await runMigration('0002_seed.sql');
-    console.log('\n🎉 All migrations applied.');
+    // 0001 & 0002 are already applied — skip them
+    await runMigration('0003_payment_methods.sql');
+    console.log('\n🎉 Migrations applied.');
   } catch (e) {
     process.exit(1);
   }

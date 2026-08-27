@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, ReactNode } from "react";
+import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -465,13 +466,35 @@ function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy
           <div className="text-xs text-[#9aa3ad]">Total bayar</div>
           <div className="text-2xl font-extrabold text-[#ff5c2b]">{rupiah(total)}</div>
         </div>
-        <button type="submit" disabled={!allFilled}
-          className={`px-6 py-3 rounded-lg text-white font-semibold transition ${allFilled ? "bg-[#ff5c2b] hover:bg-[#ff7043]" : "bg-[#3a424e] cursor-not-allowed"}`}>
-          Beli Sekarang
-        </button>
+        <SubmitButton disabled={!allFilled} />
       </form>
       {showWarn && <p className="mt-3 text-xs text-[#ffb020]">Lengkapi data akun dulu ya sebelum lanjut bayar.</p>}
     </section>
+  );
+}
+
+function SubmitButton({ disabled }: { disabled: boolean }) {
+  const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
+  return (
+    <button
+      type="submit"
+      disabled={isDisabled}
+      className={`px-6 py-3 rounded-lg text-white font-semibold transition inline-flex items-center justify-center gap-2 min-w-[160px] ${
+        isDisabled ? "bg-[#3a424e] cursor-not-allowed" : "bg-[#ff5c2b] hover:bg-[#ff7043] active:scale-[.98]"
+      }`}
+    >
+      {pending ? (
+        <>
+          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          Memproses...
+        </>
+      ) : (
+        "Beli Sekarang"
+      )}
+    </button>
   );
 }
 

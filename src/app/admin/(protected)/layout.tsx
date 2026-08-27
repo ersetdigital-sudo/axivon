@@ -20,6 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SideLink href="/admin" label="Dashboard" icon="dashboard" />
           <SideLink href="/admin/orders" label="Orders" icon="orders" />
           <SideLink href="/admin/products" label="Products" icon="products" />
+          <SideLink href="/admin/payments" label="Payments" icon="payments" />
         </nav>
         <div className="px-3 py-3 border-t border-[#262b33]">
           <div className="px-3 py-2 text-xs">
@@ -51,6 +52,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SideLink href="/admin" label="Dashboard" icon="dashboard" mobile />
           <SideLink href="/admin/orders" label="Orders" icon="orders" mobile />
           <SideLink href="/admin/products" label="Products" icon="products" mobile />
+          <SideLink href="/admin/payments" label="Payments" icon="payments" mobile />
         </nav>
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">{children}</main>
       </div>
@@ -90,6 +92,15 @@ function NavIcon({ kind }: { kind: string }) {
         <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
         <rect x="9" y="3" width="6" height="4" rx="1" />
         <path d="m9 13 2 2 4-4" />
+      </svg>
+    );
+  }
+  if (kind === "payments") {
+    return (
+      <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="6" width="20" height="13" rx="2" />
+        <path d="M2 10h20" />
+        <path d="M6 15h3" />
       </svg>
     );
   }
