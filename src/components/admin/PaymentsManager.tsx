@@ -174,7 +174,9 @@ export function PaymentsManager({ methods }: { methods: Method[] }) {
                       </button>
                     </div>
                   </div>
-                  <QRUploader methodId={m.id} currentUrl={m.qris_image_url} methodLabel={m.label} />
+                  {m.type === "qris" && (
+                    <QRUploader methodId={m.id} currentUrl={m.qris_image_url} methodLabel={m.label} />
+                  )}
                 </div>
               )}
             </section>
