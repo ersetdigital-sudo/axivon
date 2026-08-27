@@ -16,7 +16,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   const admin = createSupabaseAdminClient();
   const { data: methods } = await admin
     .from("payment_methods")
-    .select("id, label, slug, type, bank_name, account_number, account_name, instructions, fee, fee_label, is_active")
+    .select("id, label, slug, type, bank_name, account_number, account_name, instructions, fee, fee_label, qris_image_url, is_active")
     .order("sort_order", { ascending: true });
 
   const list = (methods as any) || [];

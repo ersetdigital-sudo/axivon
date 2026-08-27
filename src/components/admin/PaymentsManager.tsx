@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { togglePaymentMethodAction, updatePaymentMethodAction, deletePaymentMethodAction } from "@/app/admin/(protected)/actions";
+import { useRef, useState, useTransition } from "react";
+import Image from "next/image";
+import {
+  togglePaymentMethodAction,
+  updatePaymentMethodAction,
+  deletePaymentMethodAction,
+  uploadPaymentQRISAction,
+} from "@/app/admin/(protected)/actions";
 
 const rupiah = (n: number) => "Rp" + Number(n || 0).toLocaleString("id-ID");
 
@@ -23,6 +29,7 @@ type Method = {
   instructions: string | null;
   fee: number;
   fee_label: string | null;
+  qris_image_url: string | null;
   is_active: boolean;
 };
 
@@ -125,7 +132,7 @@ export function PaymentsManager({ methods }: { methods: Method[] }) {
               {isEditing ? (
                 <EditMethodForm method={m} action={updatePaymentMethodAction} onDone={() => setEditingId(null)} />
               ) : (
-                <div className="p-4 sm:p-5 grid lg:grid-cols-2 gap-5">
+                <div className="p-4 sm:p-5 grid lg:grid-cols-[1fr_240px] gap-5">
                   <div className="space-y-3">
                     <dl className="grid grid-cols-2 gap-3 text-xs">
                       <Field label="Label" value={m.label} />
@@ -167,6 +174,7 @@ export function PaymentsManager({ methods }: { methods: Method[] }) {
                       </button>
                     </div>
                   </div>
+                  <QRUploader methodId={m.id} currentUrl={m.qris_image_url} methodLabel={m.label} />
                 </div>
               )}
             </section>
@@ -228,6 +236,84 @@ function EditMethodForm({ method, action, onDone }: { method: Method; action: (f
           {pending ? "Menyimpan..." : "Simpan Perubahan"}
         </button>
       </div>
+    </form>
+  );
+}
+
+function QRUploader({ methodId, currentUrl, methodLabel }: { methodId: number; currentUrl: string | null; methodLabel: string }) {
+  const [pending, startTransition] = useTransition();
+  const [preview, setPreview] = useState<string | null>(currentUrl);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran file maksimal 5MB");
+      e.target.value = "";
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      alert("File harus berupa gambar");
+      e.target.value = "";
+      return;
+    }
+    const fd = new FormData();
+    fd.set("id", String(methodId));
+    fd.set("file", file);
+    startTransition(async () => {
+      await uploadPaymentQRISAction(fd);
+      // Server action redirects, so reaching here means success
+      // The page revalidates and reloads with the new image
+    });
+  };
+
+  return (
+    <form ref={formRef} action={uploadPaymentQRISAction} encType="multipart/form-data" className="space-y-2">
+      <input type="hidden" name="id" value={methodId} />
+      <div className="text-[10px] font-bold uppercase tracking-wider text-[#6d7681]">QRIS Image</div>
+      {preview ? (
+        <div className="relative bg-white rounded-lg p-2 aspect-square flex items-center justify-center overflow-hidden border border-[#262b33]">
+          <Image
+            src={preview}
+            alt={`QRIS ${methodLabel}`}
+            width={240}
+            height={240}
+            className="w-full h-full object-contain"
+            unoptimized
+          />
+        </div>
+      ) : (
+        <div className="bg-[#0d0f12] border-2 border-dashed border-[#262b33] rounded-lg aspect-square flex flex-col items-center justify-center text-center text-xs text-[#6d7681] p-4 gap-2">
+          <svg className="w-8 h-8 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <path d="M14 14h3v3h-3zM18 18h3v3M14 18h2" />
+          </svg>
+          <span>Belum ada QR.<br />Upload di bawah.</span>
+        </div>
+      )}
+      <label className="block">
+        <span className="text-[10px] text-[#6d7681]">Upload gambar baru (PNG/JPG/WebP, max 5MB)</span>
+        <input
+          type="file"
+          name="file"
+          accept="image/*"
+          required
+          onChange={onFileChange}
+          disabled={pending}
+          className="mt-1 w-full text-xs text-[#9aa3ad] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-[#1c2026] file:text-[#eef1f4] file:text-xs file:font-bold hover:file:bg-[#262b33] file:cursor-pointer disabled:opacity-50"
+        />
+      </label>
+      {pending && (
+        <div className="text-[10px] text-[#ff5c2b] flex items-center gap-1.5">
+          <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          Mengupload...
+        </div>
+      )}
     </form>
   );
 }

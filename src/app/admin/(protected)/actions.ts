@@ -239,3 +239,33 @@ export async function deletePaymentMethodAction(formData: FormData) {
   revalidatePath("/admin/payments");
   redirect("/admin/payments?msg=Metode+pembayaran+berhasil+dihapus&toast=ok");
 }
+
+export async function uploadPaymentQRISAction(formData: FormData) {
+  const id = Number(formData.get("id") || 0);
+  if (!id) redirect("/admin/payments?msg=Invalid+id&toast=err");
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/admin/payments?msg=Unauthorized&toast=err");
+
+  const file = formData.get("file") as File | null;
+  if (!file || file.size === 0) redirect("/admin/payments?msg=Pilih+gambar+terlebih+dahulu&toast=err");
+  if (file.size > 5 * 1024 * 1024) redirect("/admin/payments?msg=Ukuran+file+maks+5MB&toast=err");
+  if (!file.type.startsWith("image/")) redirect("/admin/payments?msg=File+harus+berupa+gambar&toast=err");
+
+  let secureUrl: string;
+  try {
+    const { uploadToCloudinary } = await import("@/lib/cloudinary");
+    const { secure_url } = await uploadToCloudinary(file, `axivon/payment-methods/${id}`);
+    secureUrl = secure_url;
+  } catch (err) {
+    redirect(`/admin/payments?msg=Upload+gagal:+${encodeURIComponent(String((err as Error).message || err))}&toast=err`);
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin.from("payment_methods").update({ qris_image_url: secureUrl }).eq("id", id);
+  if (error) redirect(`/admin/payments?msg=Gagal+simpan+URL:+${encodeURIComponent(error.message)}&toast=err`);
+
+  revalidatePath("/admin/payments");
+  redirect("/admin/payments?msg=QRIS+berhasil+diupload&toast=ok");
+}
