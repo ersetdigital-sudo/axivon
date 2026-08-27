@@ -25,6 +25,8 @@ export default async function OrderPage({ params }: { params: Promise<{ code: st
     .eq("is_active", true);
   const pm = (paymentMethods || []).find((m: any) => m.label === order.payment_method);
 
+  console.log("[order/[code]]", { code, status: order.status, payment_method: order.payment_method, methods: paymentMethods?.map((m: any) => m.label), pmFound: !!pm, pmType: pm?.type, pmQR: pm?.qris_image_url?.slice(0, 50) });
+
   const isPending = order.status === "pending";
   const isPaid = order.status === "paid" || order.status === "success";
 
