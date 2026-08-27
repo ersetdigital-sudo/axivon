@@ -8,7 +8,7 @@ export default async function AdminProductsPage() {
   const { supabase } = await requireStaff();
   const { data: products } = await supabase
     .from("products")
-    .select("id, label, price, old_price, coins, desc, badge, is_active, sort_order, games(slug, name)")
+    .select("id, label, price, old_price, coins, description, badge, is_active, sort_order, games(slug, name)")
     .order("game_id", { ascending: true })
     .order("sort_order", { ascending: true });
 
@@ -55,7 +55,7 @@ export default async function AdminProductsPage() {
                     <tr key={p.id} className="border-b border-[#262b33] last:border-0 hover:bg-[#1c2026]/40 transition">
                       <td className="px-4 py-2.5">
                         <div className="font-semibold text-xs">{p.label}</div>
-                        <div className="text-[10px] text-[#6d7681]">{p.desc}</div>
+                        <div className="text-[10px] text-[#6d7681]">{p.description}</div>
                       </td>
                       <td className="px-4 py-2.5 font-bold text-[#ff5c2b] text-xs">{rupiah(p.price)}</td>
                       <td className="px-4 py-2.5 text-[11px] text-[#6d7681] line-through">{p.old_price ? rupiah(p.old_price) : "—"}</td>

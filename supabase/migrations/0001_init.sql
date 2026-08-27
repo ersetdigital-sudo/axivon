@@ -55,7 +55,7 @@ create table if not exists public.products (
   price integer not null,
   old_price integer,
   coins integer not null default 0,
-  desc text,
+  description text,
   icon_color text,
   badge text,
   sort_order integer not null default 0,
