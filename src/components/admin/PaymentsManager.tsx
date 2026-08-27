@@ -245,28 +245,89 @@ function EditMethodForm({ method, action, onDone }: { method: Method; action: (f
 function QRUploader({ methodId, currentUrl, methodLabel }: { methodId: number; currentUrl: string | null; methodLabel: string }) {
   const [pending, startTransition] = useTransition();
   const [preview, setPreview] = useState<string | null>(currentUrl);
+  const [compressing, setCompressing] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Ukuran file maksimal 5MB");
+  const compressImage = (file: File, maxSize = 1024, quality = 0.85): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let { width, height } = img;
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          } else {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas not supported"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Compression failed"));
+              return;
+            }
+            const compressedName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+            resolve(new File([blob], compressedName, { type: "image/jpeg" }));
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Gagal membaca gambar"));
+      };
+      img.src = objectUrl;
+    });
+  };
+
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const original = e.target.files?.[0];
+    if (!original) return;
+    if (original.size > 15 * 1024 * 1024) {
+      alert("File terlalu besar (maks 15MB)");
       e.target.value = "";
       return;
     }
-    if (!file.type.startsWith("image/")) {
+    if (!original.type.startsWith("image/")) {
       alert("File harus berupa gambar");
       e.target.value = "";
       return;
     }
+    let fileToUpload = original;
+    try {
+      setCompressing(true);
+      fileToUpload = await compressImage(original);
+    } catch (err) {
+      console.warn("Compress failed, upload original", err);
+    } finally {
+      setCompressing(false);
+    }
+
+    if (fileToUpload.size > 5 * 1024 * 1024) {
+      alert("File hasil kompres masih >5MB, coba gambar lain");
+      e.target.value = "";
+      return;
+    }
+
     const fd = new FormData();
     fd.set("id", String(methodId));
-    fd.set("file", file);
+    fd.set("file", fileToUpload);
     startTransition(async () => {
       await uploadPaymentQRISAction(fd);
-      // Server action redirects, so reaching here means success
-      // The page revalidates and reloads with the new image
     });
   };
 
@@ -308,12 +369,23 @@ function QRUploader({ methodId, currentUrl, methodLabel }: { methodId: number; c
           className="mt-1 w-full text-xs text-[#9aa3ad] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-[#1c2026] file:text-[#eef1f4] file:text-xs file:font-bold hover:file:bg-[#262b33] file:cursor-pointer disabled:opacity-50"
         />
       </label>
-      {pending && (
-        <div className="text-[10px] text-[#ff5c2b] flex items-center gap-1.5">
-          <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-          </svg>
-          Mengupload...
+      {(pending || compressing) && (
+        <div className="text-[10px] flex items-center gap-1.5">
+          {compressing ? (
+            <>
+              <svg className="w-3 h-3 animate-spin text-[#5bc8ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <span className="text-[#5bc8ff]">Mengompres gambar...</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-3 h-3 animate-spin text-[#ff5c2b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <span className="text-[#ff5c2b]">Mengupload...</span>
+            </>
+          )}
         </div>
       )}
     </form>
