@@ -21,7 +21,6 @@ type Product = {
   badge: string | null;
   is_active: boolean;
   sort_order: number;
-  icon_color: string | null;
   games: { slug: string; name: string; short_name: string } | null;
 };
 
@@ -115,7 +114,7 @@ export function ProductsManager({ products, games }: { products: Product[]; game
                         className={`border-b border-[#262b33] last:border-0 transition ${!isActive ? "opacity-60" : "hover:bg-[#1c2026]/40"}`}
                       >
                         <td className="px-4 py-2.5">
-                          <div className={`font-semibold text-xs ${p.icon_color || "text-[#5bc8ff]"}`}>{p.label}</div>
+                          <div className="font-semibold text-xs text-[#5bc8ff]">{p.label}</div>
                           <div className="text-[10px] text-[#6d7681]">{p.description || "—"}</div>
                         </td>
                         <td className="px-4 py-2.5 font-bold text-[#ff5c2b] text-xs">{rupiah(p.price)}</td>
@@ -263,9 +262,6 @@ function AddProductForm({ games, action, onClose }: { games: Game[]; action: (fd
         <Field label="Badge">
           <input name="badge" placeholder="HOT / EVENT / BEST" className="form-input" />
         </Field>
-        <Field label="Icon Color (Tailwind)">
-          <input name="icon_color" defaultValue="text-[#5bc8ff]" className="form-input" />
-        </Field>
         <Field label="Deskripsi" full>
           <input name="description" placeholder="Bonus +5 diamond" className="form-input" />
         </Field>
@@ -311,9 +307,6 @@ function EditProductForm({ product, action, onDone }: { product: Product; action
       </Field>
       <Field label="Badge">
         <input name="badge" defaultValue={product.badge || ""} placeholder="HOT / EVENT / BEST" className="form-input" />
-      </Field>
-      <Field label="Icon Color" full>
-        <input name="icon_color" defaultValue={product.icon_color || "text-[#5bc8ff]"} className="form-input" />
       </Field>
       <Field label="Deskripsi" full>
         <input name="description" defaultValue={product.description || ""} placeholder="Bonus +5 diamond" className="form-input" />
