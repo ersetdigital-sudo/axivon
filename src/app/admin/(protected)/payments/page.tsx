@@ -1,57 +1,83 @@
 import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { PaymentsManager } from "@/components/admin/PaymentsManager";
-import { Toast } from "@/components/admin/Toast";
+import { AdminShell } from "@/components/admin/AdminShell";
 import Link from "next/link";
 
+const TYPE_META: Record<string, { label: string; num: string; ring: string; chip: string }> = {
+  qris: { label: "QRIS", num: "text-[#ff8a3f]", ring: "border-[#ff5c2b]/30 bg-gradient-to-br from-[#ff5c2b]/10 to-transparent", chip: "bg-[#ff5c2b]/15 text-[#ff5c2b]" },
+  bank_transfer: { label: "Transfer Bank", num: "text-[#5bc8ff]", ring: "border-[#5bc8ff]/30 bg-gradient-to-br from-[#5bc8ff]/10 to-transparent", chip: "bg-[#5bc8ff]/15 text-[#5bc8ff]" },
+  ewallet: { label: "E-Wallet", num: "text-[#c07bff]", ring: "border-[#c07bff]/30 bg-gradient-to-br from-[#c07bff]/10 to-transparent", chip: "bg-[#c07bff]/15 text-[#c07bff]" },
+  pulsa: { label: "Pulsa", num: "text-[#ffb020]", ring: "border-[#ffb020]/30 bg-gradient-to-br from-[#ffb020]/10 to-transparent", chip: "bg-[#ffb020]/15 text-[#ffb020]" },
+};
+
 export default async function AdminPaymentsPage({ searchParams }: { searchParams: Promise<{ msg?: string; toast?: string }> }) {
-  await requireStaff();
+  const { profile } = await requireStaff();
   const admin = createSupabaseAdminClient();
   const { data: methods } = await admin
     .from("payment_methods")
     .select("id, label, slug, type, bank_name, account_number, account_name, instructions, fee, fee_label, is_active")
     .order("sort_order", { ascending: true });
 
-  const { msg, toast } = await searchParams;
-  const variant: "success" | "error" = toast === "err" ? "error" : "success";
+  const list = (methods as any) || [];
+  const activeCount = list.filter((m: any) => m.is_active).length;
+  const inactiveCount = list.length - activeCount;
+  const totalFee = list.filter((m: any) => m.is_active).reduce((s: number, m: any) => s + (m.fee || 0), 0);
+  const byType = list.reduce((acc: Record<string, number>, m: any) => {
+    acc[m.type] = (acc[m.type] || 0) + 1;
+    return acc;
+  }, {});
 
-  const activeCount = methods?.filter((m: any) => m.is_active).length ?? 0;
-  const totalCount = methods?.length ?? 0;
+  const { msg, toast } = await searchParams;
+  const toastData = msg ? { message: msg, variant: (toast === "err" ? "error" : "success") as "success" | "error" } : undefined;
 
   return (
-    <div className="space-y-6">
-      {msg && <Toast message={msg} variant={variant} />}
-
-      <div className="relative overflow-hidden rounded-2xl border border-[#262b33] bg-gradient-to-br from-[#171a1f] via-[#15181d] to-[#12151a] p-5 sm:p-6">
-        <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-[#ff5c2b]/10 blur-3xl pointer-events-none" />
-        <div className="relative flex flex-wrap items-end justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] grid place-items-center shadow-lg shadow-[#ff5c2b]/30">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="6" width="20" height="13" rx="2" />
-                <path d="M2 10h20" />
-                <path d="M6 15h3" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Payment Methods</h1>
-              <p className="text-sm text-[#9aa3ad] mt-1">Toggle aktif/nonaktif, edit info, atau hapus metode.</p>
-            </div>
+    <AdminShell profile={profile} toast={toastData}>
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Payment Methods</h1>
+            <p className="text-sm text-[#9aa3ad] mt-1">Toggle, edit, atau hapus metode pembayaran.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="px-3 py-1.5 rounded-lg bg-[#1c2026] border border-[#262b33] text-xs">
-              <span className="text-[#6d7681]">Aktif </span>
-              <span className="font-extrabold text-[#2fbf71]">{activeCount}</span>
-              <span className="text-[#6d7681]"> / {totalCount}</span>
-            </div>
-            <Link href="/admin" className="text-xs font-semibold text-[#9aa3ad] hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-[#1c2026]">
-              ← Dashboard
-            </Link>
-          </div>
+          <Link
+            href="/admin"
+            className="text-xs font-semibold text-[#9aa3ad] hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-[#1c2026]"
+          >
+            ← Dashboard
+          </Link>
         </div>
-      </div>
 
-      <PaymentsManager methods={(methods as any) || []} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <KpiCard label="Total Metode" value={String(list.length)} sub={`${activeCount} aktif`} accent="orange" />
+          <KpiCard label="Aktif" value={String(activeCount)} sub={`${inactiveCount} nonaktif`} accent="green" />
+          <KpiCard label="Total Fee" value={rupiah(totalFee)} sub="dari semua metode" accent="blue" />
+          <KpiCard label="Tipe" value={String(Object.keys(byType).length)} sub={Object.keys(byType).join(" · ")} accent="purple" />
+        </div>
+
+        <PaymentsManager methods={list} />
+      </div>
+    </AdminShell>
+  );
+}
+
+const rupiah = (n: number) => "Rp" + Number(n || 0).toLocaleString("id-ID");
+
+function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: "orange" | "green" | "blue" | "purple" }) {
+  const styles: Record<string, { ring: string; chip: string; num: string }> = {
+    orange: { ring: "border-[#ff5c2b]/30 bg-gradient-to-br from-[#ff5c2b]/10 to-transparent", chip: "bg-[#ff5c2b]/15 text-[#ff5c2b]", num: "text-[#ff5c2b]" },
+    green: { ring: "border-[#2fbf71]/30 bg-gradient-to-br from-[#2fbf71]/10 to-transparent", chip: "bg-[#2fbf71]/15 text-[#2fbf71]", num: "text-[#2fbf71]" },
+    blue: { ring: "border-[#5bc8ff]/30 bg-gradient-to-br from-[#5bc8ff]/10 to-transparent", chip: "bg-[#5bc8ff]/15 text-[#5bc8ff]", num: "text-[#5bc8ff]" },
+    purple: { ring: "border-[#c07bff]/30 bg-gradient-to-br from-[#c07bff]/10 to-transparent", chip: "bg-[#c07bff]/15 text-[#c07bff]", num: "text-[#c07bff]" },
+  };
+  const s = styles[accent];
+  return (
+    <div className={`relative overflow-hidden border ${s.ring} rounded-2xl p-4 hover:scale-[1.02] transition-transform`}>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9aa3ad]">{label}</span>
+        <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${s.chip}`}>Live</span>
+      </div>
+      <div className={`text-2xl md:text-3xl font-extrabold mt-1.5 ${s.num}`}>{value}</div>
+      <div className="text-[11px] text-[#6d7681] mt-0.5">{sub}</div>
     </div>
   );
 }

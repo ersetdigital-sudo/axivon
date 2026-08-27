@@ -1,7 +1,7 @@
 import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { OrdersManager } from "@/components/admin/OrdersManager";
-import { Toast } from "@/components/admin/Toast";
+import { AdminShell } from "@/components/admin/AdminShell";
 import Link from "next/link";
 
 const rupiah = (n: number) => "Rp" + Number(n || 0).toLocaleString("id-ID");
@@ -15,59 +15,65 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
     .order("created_at", { ascending: false })
     .limit(100);
 
-  const { msg, toast } = await searchParams;
-  const variant: "success" | "error" = toast === "err" ? "error" : "success";
-
-  const totalOrders = orders?.length ?? 0;
-  const pendingCount = orders?.filter((o: any) => ["pending", "paid", "processing"].includes(o.status)).length ?? 0;
-  const totalRevenue = (orders || [])
+  const list = (orders as any) || [];
+  const totalRevenue = list
     .filter((o: any) => o.status === "success" || o.status === "paid")
-    .reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+    .reduce((s: number, o: any) => s + (o.total || 0), 0);
+  const pendingCount = list.filter((o: any) => ["pending", "paid", "processing"].includes(o.status)).length;
+  const successCount = list.filter((o: any) => o.status === "success").length;
+  const failedCount = list.filter((o: any) => o.status === "failed").length;
+  const uniqueCustomers = new Set(list.map((o: any) => o.customer_uid).filter(Boolean)).size;
+
+  const { msg, toast } = await searchParams;
+  const toastData = msg ? { message: msg, variant: (toast === "err" ? "error" : "success") as "success" | "error" } : undefined;
 
   return (
-    <div className="space-y-6">
-      {msg && <Toast message={msg} variant={variant} />}
-
-      <div className="relative overflow-hidden rounded-2xl border border-[#262b33] bg-gradient-to-br from-[#171a1f] via-[#15181d] to-[#12151a] p-5 sm:p-6">
-        <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-[#ff5c2b]/10 blur-3xl pointer-events-none" />
-        <div className="relative flex flex-wrap items-end justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] grid place-items-center shadow-lg shadow-[#ff5c2b]/30">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                <rect x="9" y="3" width="6" height="4" rx="1" />
-                <path d="m9 13 2 2 4-4" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Orders</h1>
-              <p className="text-sm text-[#9aa3ad] mt-1">100 order terakhir. Update status, hapus, atau filter.</p>
-            </div>
+    <AdminShell profile={profile} toast={toastData}>
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Orders</h1>
+            <p className="text-sm text-[#9aa3ad] mt-1">100 order terakhir. Update status, hapus, atau filter.</p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="px-3 py-1.5 rounded-lg bg-[#1c2026] border border-[#262b33] text-xs">
-              <span className="text-[#6d7681]">Pending </span>
-              <span className="font-extrabold text-[#ffb020]">{pendingCount}</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-lg bg-[#1c2026] border border-[#262b33] text-xs">
-              <span className="text-[#6d7681]">Revenue </span>
-              <span className="font-extrabold text-[#2fbf71]">{rupiah(totalRevenue)}</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-lg bg-[#1c2026] border border-[#262b33] text-xs">
-              <span className="text-[#6d7681]">Total </span>
-              <span className="font-extrabold text-white">{totalOrders}</span>
-            </div>
-            <Link href="/admin" className="text-xs font-semibold text-[#9aa3ad] hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-[#1c2026]">
-              ← Dashboard
-            </Link>
-          </div>
+          <Link
+            href="/admin"
+            className="text-xs font-semibold text-[#9aa3ad] hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-[#1c2026]"
+          >
+            ← Dashboard
+          </Link>
         </div>
-      </div>
 
-      <OrdersManager
-        orders={(orders as any) || []}
-        actorLabel={profile.email || profile.full_name || "admin"}
-      />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <KpiCard label="Total Order" value={String(list.length)} sub={`${uniqueCustomers} UID unik`} accent="orange" />
+          <KpiCard label="Pending" value={String(pendingCount)} sub="perlu diproses" accent="amber" />
+          <KpiCard label="Success" value={String(successCount)} sub={`${failedCount} failed`} accent="green" />
+          <KpiCard label="Revenue" value={rupiah(totalRevenue)} sub="paid + success" accent="blue" />
+          <KpiCard label="Avg. Order" value={rupiah(list.length ? Math.round(totalRevenue / list.filter((o: any) => o.status === "success" || o.status === "paid").length) || 1 : 0)} sub="per order sukses" accent="purple" />
+        </div>
+
+        <OrdersManager orders={list} actorLabel={profile.email || profile.full_name || "admin"} />
+      </div>
+    </AdminShell>
+  );
+}
+
+function KpiCard({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: "orange" | "green" | "blue" | "purple" | "amber" }) {
+  const styles: Record<string, { ring: string; chip: string; num: string }> = {
+    orange: { ring: "border-[#ff5c2b]/30 bg-gradient-to-br from-[#ff5c2b]/10 to-transparent", chip: "bg-[#ff5c2b]/15 text-[#ff5c2b]", num: "text-[#ff5c2b]" },
+    amber: { ring: "border-[#ffb020]/30 bg-gradient-to-br from-[#ffb020]/10 to-transparent", chip: "bg-[#ffb020]/15 text-[#ffb020]", num: "text-[#ffb020]" },
+    green: { ring: "border-[#2fbf71]/30 bg-gradient-to-br from-[#2fbf71]/10 to-transparent", chip: "bg-[#2fbf71]/15 text-[#2fbf71]", num: "text-[#2fbf71]" },
+    blue: { ring: "border-[#5bc8ff]/30 bg-gradient-to-br from-[#5bc8ff]/10 to-transparent", chip: "bg-[#5bc8ff]/15 text-[#5bc8ff]", num: "text-[#5bc8ff]" },
+    purple: { ring: "border-[#c07bff]/30 bg-gradient-to-br from-[#c07bff]/10 to-transparent", chip: "bg-[#c07bff]/15 text-[#c07bff]", num: "text-[#c07bff]" },
+  };
+  const s = styles[accent];
+  return (
+    <div className={`relative overflow-hidden border ${s.ring} rounded-2xl p-4 hover:scale-[1.02] transition-transform`}>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9aa3ad]">{label}</span>
+        <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${s.chip}`}>Live</span>
+      </div>
+      <div className={`text-2xl md:text-3xl font-extrabold mt-1.5 ${s.num}`}>{value}</div>
+      <div className="text-[11px] text-[#6d7681] mt-0.5">{sub}</div>
     </div>
   );
 }

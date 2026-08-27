@@ -79,7 +79,7 @@ export function OrdersManager({ orders, actorLabel }: { orders: Order[]; actorLa
 
       <div className="bg-[#171a1f] border border-[#262b33] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[960px]">
+          <table className="w-full text-sm min-w-[820px]">
             <thead>
               <tr className="text-left text-[10px] uppercase tracking-wider text-[#6d7681] border-b border-[#262b33] bg-[#0d0f12]/40">
                 <th className="px-4 py-3">Order</th>
@@ -87,14 +87,13 @@ export function OrdersManager({ orders, actorLabel }: { orders: Order[]; actorLa
                 <th className="px-4 py-3">Akun</th>
                 <th className="px-4 py-3">Bayar</th>
                 <th className="px-4 py-3">Total</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                <th className="px-4 py-3 text-right">Status & Aksi</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-sm text-[#6d7681]">
+                  <td colSpan={6} className="px-5 py-10 text-center text-sm text-[#6d7681]">
                     {orders.length === 0 ? "Belum ada order." : "Tidak ada order yang cocok dengan filter."}
                   </td>
                 </tr>
@@ -139,19 +138,16 @@ function OrderRow({ order, actorLabel }: { order: Order; actorLabel: string }) {
       <td className="px-4 py-3 align-top">
         <div className="font-bold text-[#ff5c2b] text-sm">{rupiah(order.total)}</div>
       </td>
-      <td className="px-4 py-3 align-top">
-        <span className={`inline-block text-[10px] font-extrabold px-2 py-1 rounded-md border ${STATUS_COLOR[status] || STATUS_COLOR.pending}`}>
-          {STATUS_LABEL[status] || status}
-        </span>
-      </td>
-      <td className="px-4 py-3 align-top text-right">
-        <div className="flex items-center gap-1.5 justify-end flex-wrap">
+      <td className="px-4 py-3 align-top" colSpan={2}>
+        <div className="flex items-center gap-1.5 justify-end">
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className={`form-select !py-1.5 !text-xs min-w-[110px] ${dirty ? "!border-[#ff5c2b] !shadow-[0_0_0_2px_rgba(255,92,43,0.2)]" : ""}`}
+            className={`appearance-none cursor-pointer text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1.5 rounded-md border bg-transparent focus:outline-none ${STATUS_COLOR[status] || STATUS_COLOR.pending} ${
+              dirty ? "ring-2 ring-[#ff5c2b]/50" : ""
+            }`}
           >
-            {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+            {STATUS_OPTIONS.map((s) => <option key={s} value={s} className="bg-[#171a1f] text-white normal-case font-semibold">{STATUS_LABEL[s]}</option>)}
           </select>
           <button
             type="button"
@@ -165,14 +161,23 @@ function OrderRow({ order, actorLabel }: { order: Order; actorLabel: string }) {
                 await updateOrderStatusAction(fd);
               });
             }}
-            className="px-2.5 py-1.5 rounded-md bg-gradient-to-r from-[#ff5c2b] to-[#ff7a3f] text-white text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md hover:shadow-[#ff5c2b]/30 transition"
+            title="Simpan perubahan"
+            className="w-8 h-8 grid place-items-center rounded-md bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] text-white disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-md hover:shadow-[#ff5c2b]/40 transition shrink-0"
           >
-            {pending ? "..." : "Simpan"}
+            {pending ? (
+              <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
           </button>
           <form
             action={deleteOrderAction}
             onSubmit={(e) => {
-              if (!confirm(`Hapus order ${order.order_code}? Tindakan ini tidak bisa dibatalkan.`)) e.preventDefault();
+              if (!confirm(`Hapus order ${order.order_code}?`)) e.preventDefault();
             }}
             className="inline"
           >
@@ -180,7 +185,7 @@ function OrderRow({ order, actorLabel }: { order: Order; actorLabel: string }) {
             <button
               type="submit"
               title="Hapus order"
-              className="px-2 py-1.5 rounded-md bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] hover:border-[#ff5c5c]/50 hover:text-[#ff8a8a] transition"
+              className="w-8 h-8 grid place-items-center rounded-md bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] hover:border-[#ff5c5c]/50 hover:text-[#ff8a8a] hover:bg-[#ff5c5c]/10 transition shrink-0"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" />
