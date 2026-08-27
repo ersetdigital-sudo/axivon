@@ -1,8 +1,9 @@
-"use client";
-
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
-const config: GameTopUpConfig = {
+export const dynamic = "force-dynamic";
+
+const STATIC: Omit<GameTopUpConfig, "nominals"> = {
   slug: "/cod-mobile",
   name: "Call of Duty: Mobile",
   shortName: "COD Mobile",
@@ -15,22 +16,9 @@ const config: GameTopUpConfig = {
     { id: "playerId", label: "Activision ID", placeholder: "Player#1234567" },
   ],
   accountHelp: (
-    <>
-      Buka profil dalam game, salin Activision ID. Format: <span className="text-[#eef1f4]">Nama#Tag Angka</span>.
-    </>
+    <>Buka profil dalam game, salin Activision ID. Format: <span className="text-[#eef1f4]">Nama#Tag Angka</span>.</>
   ),
   ntabs: ["Promo", "CP", "Battle Pass", "Bundle", "Event"],
-  nominals: [
-    { label: "80 CP", price: 15000, oldPrice: 16500, desc: "Bonus +8 CP", coins: 80, iconColor: "text-[#ff5c2b]" },
-    { label: "400 CP", price: 72000, oldPrice: 78000, desc: "Bonus +45 CP", coins: 400, iconColor: "text-[#ff5c2b]" },
-    { label: "800 CP", price: 142000, oldPrice: 152000, desc: "Bonus +90 CP", coins: 800, iconColor: "text-[#ff5c2b]" },
-    { label: "2000 CP", price: 348000, oldPrice: 370000, desc: "Bonus +240 CP", coins: 2000, iconColor: "text-[#ff5c2b]" },
-    { label: "5000 CP", price: 845000, oldPrice: 895000, desc: "Bonus +650 CP", coins: 5000, iconColor: "text-[#ff5c2b]" },
-    { label: "10000 CP", price: 1650000, oldPrice: 1750000, desc: "Bonus +1400 CP", coins: 10000, iconColor: "text-[#ff5c2b]" },
-    { label: "20800 CP", price: 3390000, oldPrice: 3580000, desc: "Bonus +3000 CP", coins: 20800, iconColor: "text-[#ff5c2b]" },
-    { label: "Battle Pass", price: 99000, oldPrice: 109000, desc: "Akses 100 tier reward", coins: 990, iconColor: "text-[#c07bff]" },
-    { label: "Battle Pass Bundle", price: 249000, oldPrice: 289000, desc: "Pass + 1000 CP bonus", coins: 2490, iconColor: "text-[#c07bff]", badge: "HOT" },
-  ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
     { label: "DANA", fee: 1000, desc: "Biaya Rp1.000" },
@@ -44,6 +32,23 @@ const config: GameTopUpConfig = {
   ],
 };
 
-export default function CodMobilePage() {
-  return <GameTopUpPage config={config} iconKind="coin" />;
+export default async function CodMobilePage() {
+  const admin = createSupabaseAdminClient();
+  const { data: prods } = await admin
+    .from("products")
+    .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
+    .eq("game_id", 5)
+    .eq("is_active", true)
+    .order("sort_order");
+  const nominals = (prods || []).map((p) => ({
+    id: p.id,
+    label: p.label,
+    price: p.price,
+    oldPrice: p.old_price ?? p.price,
+    desc: p.description || "",
+    coins: p.coins,
+    iconColor: p.icon_color || "text-[#ff5c2b]",
+    badge: p.badge || undefined,
+  }));
+  return <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="coin" />;
 }

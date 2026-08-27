@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { createOrderAction } from "@/app/actions";
 
 export interface NominalItem {
+  id?: number;
   label: string;
   price: number;
   oldPrice: number;
@@ -454,6 +455,7 @@ function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy
       </dl>
       <form action={createOrderAction} onSubmit={handleBuy} className="mt-4 pt-4 border-t border-[#262b33] flex items-end justify-between gap-4 flex-wrap">
         <input type="hidden" name="game_slug" value={gameSlug} />
+        <input type="hidden" name="product_id" value={nom.id} />
         <input type="hidden" name="product_label" value={nom.label} />
         <input type="hidden" name="product_price" value={nom.price} />
         <input type="hidden" name="product_old_price" value={nom.oldPrice} />

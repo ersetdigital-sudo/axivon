@@ -5,6 +5,7 @@ import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/sup
 
 export async function createOrderAction(formData: FormData) {
   const gameSlug = String(formData.get("game_slug") || "");
+  const productId = Number(formData.get("product_id") || 0);
   const productLabel = String(formData.get("product_label") || "");
   const productPrice = Number(formData.get("product_price") || 0);
   const productOldPrice = Number(formData.get("product_old_price") || 0) || null;
@@ -20,7 +21,7 @@ export async function createOrderAction(formData: FormData) {
 
   const admin = createSupabaseAdminClient();
 
-  // Look up game & product (use label match to find product id)
+  // Look up game
   const { data: game } = await admin
     .from("games")
     .select("id, name, short_name")
@@ -29,15 +30,32 @@ export async function createOrderAction(formData: FormData) {
 
   if (!game) redirect(`/order-error?msg=${encodeURIComponent("Game tidak ditemukan.")}`);
 
-  const { data: product } = await admin
-    .from("products")
-    .select("id, label, price, coins")
-    .eq("game_id", game.id)
-    .eq("label", productLabel)
-    .eq("is_active", true)
-    .single();
+  // Look up product: prefer product_id (exact), fallback to label match
+  let product;
+  if (productId) {
+    const { data } = await admin
+      .from("products")
+      .select("id, label, price, coins, is_active")
+      .eq("id", productId)
+      .maybeSingle();
+    product = data;
+  }
+  if (!product) {
+    const { data } = await admin
+      .from("products")
+      .select("id, label, price, coins, is_active")
+      .eq("game_id", game.id)
+      .eq("label", productLabel)
+      .maybeSingle();
+    product = data;
+  }
 
-  if (!product) redirect(`/order-error?msg=${encodeURIComponent("Produk tidak valid atau nonaktif.")}`);
+  if (!product) {
+    redirect(`/order-error?msg=${encodeURIComponent(`Produk "${productLabel}" tidak ditemukan untuk game ${gameSlug}.`)}`);
+  }
+  if (!product.is_active) {
+    redirect(`/order-error?msg=${encodeURIComponent(`Produk "${productLabel}" sedang nonaktif.`)}`);
+  }
 
   // Use price from server, not client (avoid tampering)
   const subtotal = product.price;

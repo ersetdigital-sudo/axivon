@@ -1,8 +1,9 @@
-"use client";
-
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
-const config: GameTopUpConfig = {
+export const dynamic = "force-dynamic";
+
+const STATIC: Omit<GameTopUpConfig, "nominals"> = {
   slug: "/genshin-impact",
   name: "Genshin Impact",
   shortName: "Genshin Impact",
@@ -16,22 +17,9 @@ const config: GameTopUpConfig = {
     { id: "server", label: "Server", placeholder: "Asia" },
   ],
   accountHelp: (
-    <>
-      Buka game, tap Paimon Menu kiri atas. UID tertera di pojok kanan bawah. Server: Asia / America / Europe / TW / SAR.
-    </>
+    <>Buka game, tap Paimon Menu kiri atas. UID tertera di pojok kanan bawah. Server: Asia / America / Europe / TW / SAR.</>
   ),
   ntabs: ["Promo", "Genesis Crystal", "Blessing", "Bundle", "Event"],
-  nominals: [
-    { label: "60 Genesis", price: 16000, oldPrice: 17500, desc: "Bonus 60 crystal", coins: 60, iconColor: "text-[#5bc8ff]" },
-    { label: "300 + 30 Genesis", price: 79000, oldPrice: 85000, desc: "Bonus 30 crystal", coins: 330, iconColor: "text-[#5bc8ff]" },
-    { label: "980 + 110 Genesis", price: 249000, oldPrice: 265000, desc: "Bonus 110 crystal", coins: 1090, iconColor: "text-[#5bc8ff]" },
-    { label: "1980 + 260 Genesis", price: 479000, oldPrice: 510000, desc: "Bonus 260 crystal", coins: 2240, iconColor: "text-[#5bc8ff]" },
-    { label: "3280 + 600 Genesis", price: 799000, oldPrice: 845000, desc: "Bonus 600 crystal", coins: 3880, iconColor: "text-[#5bc8ff]" },
-    { label: "6480 + 1600 Genesis", price: 1599000, oldPrice: 1690000, desc: "Bonus 1600 crystal", coins: 8080, iconColor: "text-[#5bc8ff]" },
-    { label: "12960 + 3200 Genesis", price: 3199000, oldPrice: 3380000, desc: "Bonus 3200 crystal", coins: 16160, iconColor: "text-[#5bc8ff]" },
-    { label: "Welkin Moon", price: 79000, oldPrice: 85000, desc: "90 crystal harian 30 hari", coins: 2790, iconColor: "text-[#c07bff]" },
-    { label: "Genesis Crystals + BP", price: 189000, oldPrice: 215000, desc: "Crystal + Battle Pass", coins: 1890, iconColor: "text-[#c07bff]", badge: "BEST" },
-  ],
   payments: [
     { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
     { label: "GoPay", fee: 1000, desc: "Biaya Rp1.000" },
@@ -45,6 +33,23 @@ const config: GameTopUpConfig = {
   ],
 };
 
-export default function GenshinImpactPage() {
-  return <GameTopUpPage config={config} iconKind="crystal" />;
+export default async function GenshinImpactPage() {
+  const admin = createSupabaseAdminClient();
+  const { data: prods } = await admin
+    .from("products")
+    .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
+    .eq("game_id", 6)
+    .eq("is_active", true)
+    .order("sort_order");
+  const nominals = (prods || []).map((p) => ({
+    id: p.id,
+    label: p.label,
+    price: p.price,
+    oldPrice: p.old_price ?? p.price,
+    desc: p.description || "",
+    coins: p.coins,
+    iconColor: p.icon_color || "text-[#5bc8ff]",
+    badge: p.badge || undefined,
+  }));
+  return <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="crystal" />;
 }
