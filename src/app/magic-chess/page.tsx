@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
@@ -33,14 +37,32 @@ const STATIC: Omit<GameTopUpConfig, "nominals"> = {
   ],
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Top Up Diamond Magic Chess Go Go Murah 24 Jam | Axivon",
+    description: "Top up diamond Magic Chess: Go Go otomatis 30 detik. Bayar via QRIS, GoPay, BCA. Diamond langsung masuk ke akun Moonton kamu.",
+    keywords: ["top up magic chess", "top up diamond magic chess", "MCGG diamond murah"],
+    alternates: { canonical: `${SITE_URL}/magic-chess` },
+    openGraph: {
+      title: "Top Up Diamond Magic Chess Murah 24 Jam | Axivon",
+      description: "Top up diamond Magic Chess otomatis 30 detik.",
+      url: `${SITE_URL}/magic-chess`,
+      type: "website",
+      images: [{ url: "/images/9d357c22-da08-4270-9750-efeb7890bc0e.png", width: 800, height: 800, alt: "Top Up Magic Chess" }],
+    },
+  };
+}
+
 export default async function MagicChessPage() {
   const admin = createSupabaseAdminClient();
-  const { data: prods } = await admin
-    .from("products")
-    .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
-    .eq("game_id", 4)
-    .eq("is_active", true)
-    .order("sort_order");
+  const [{ data: prods }] = await Promise.all([
+    admin
+      .from("products")
+      .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
+      .eq("game_id", 4)
+      .eq("is_active", true)
+      .order("sort_order"),
+  ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
     label: p.label,
@@ -51,5 +73,38 @@ export default async function MagicChessPage() {
     iconColor: p.icon_color || "text-[#2fbf71]",
     badge: p.badge || undefined,
   }));
-  return <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="diamond" />;
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_URL}/magic-chess#service`,
+    name: "Top Up Diamond Magic Chess",
+    description: "Top up diamond Magic Chess otomatis 24 jam.",
+    provider: { "@id": `${SITE_URL}/#organization` },
+    serviceType: "Digital Top-Up",
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "IDR",
+      lowPrice: nominals.length ? Math.min(...nominals.map((n) => n.price)) : 0,
+      highPrice: nominals.length ? Math.max(...nominals.map((n) => n.price)) : 0,
+      offerCount: nominals.length,
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Beranda", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Magic Chess", item: `${SITE_URL}/magic-chess` },
+    ],
+  };
+
+  return (
+    <>
+      <Script id="ld-product-mc" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <Script id="ld-breadcrumb-mc" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="diamond" />
+    </>
+  );
 }

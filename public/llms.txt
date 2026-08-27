@@ -1,0 +1,54 @@
+# Axivon Games
+
+> Top up game online termurah, proses otomatis 24 jam. Mobile Legends, PUBG Mobile, Free Fire, Genshin Impact, Magic Chess, COD Mobile.
+
+## About
+
+Axivon Games adalah platform top up voucher & item game online untuk pasar Indonesia. Kami menyediakan diamond, UC, dan CP untuk 6 game populer dengan harga kompetitif, pembayaran via QRIS/e-wallet/transfer bank, dan proses otomatis 30 detik setelah pembayaran.
+
+## Games Supported
+
+- [Mobile Legends: Bang Bang](/mobile-legends) — Top up diamond ML termurah, proses otomatis 30 detik
+- [PUBG Mobile](/pubg-mobile) — Top up UC PUBG Mobile, instant delivery
+- [Free Fire](/free-fire) — Top up diamond Free Fire 24 jam
+- [Magic Chess: Go Go](/magic-chess) — Top up diamond MCGG via QRIS
+- [Call of Duty: Mobile](/cod-mobile) — Top up CP COD Mobile
+- [Genshin Impact](/genshin-impact) — Top up Genesis Crystal otomatis
+
+## Pricing
+
+Harga bervariasi per game dan nominal. Mulai dari Rp12.000 untuk Free Fire 70 Diamond, hingga Rp3.390.000 untuk COD Mobile 20.800 CP. Cek halaman game masing-masing untuk harga terkini.
+
+## Payment Methods
+
+- QRIS (semua e-wallet & m-banking) — gratis biaya admin
+- DANA, GoPay, OVO, ShopeePay — biaya Rp1.000–Rp1.500
+- Transfer bank BCA, BRI, Mandiri — biaya Rp2.500
+
+## Process
+
+1. Pilih game
+2. Masukkan User ID / Player ID
+3. Pilih nominal
+4. Pilih metode pembayaran
+5. Bayar
+6. Item masuk otomatis ke akun dalam < 30 detik
+
+## Contact
+
+- Customer Support: 24/7 via WhatsApp (klik tombol di halaman order)
+- Email: halo@axivongames.net
+- Location: Indonesia
+
+## Why Axivon
+
+- Proses otomatis 30 detik (no admin delay)
+- Harga kompetitif vs kompetitor
+- Payment methods lengkap (QRIS, e-wallet, transfer bank)
+- Aman — hanya User ID yang dibutuhkan, bukan password
+- Customer support 24/7
+
+## Optional
+
+- [Privacy Policy](#)
+- [Terms of Service](#)
