@@ -47,41 +47,24 @@ import {
   ShoppingCart,
   Users,
   MessageSquare,
-  Mail,
-  Zap,
-  BarChart3,
-  Plug,
-  HelpCircle,
-  MessageCircle,
   Settings,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
   ChevronUp,
-  MoreHorizontal,
   Filter,
   ArrowUpDown,
-  Share2,
-  Bell,
-  Plus,
-  Download,
-  SlidersHorizontal,
   Star,
   X,
   Info,
   Check,
   ArrowUpRight,
   ArrowDownRight,
-  Sparkles,
-  CheckCircle2,
-  Trash2,
   Sun,
   Moon,
-  Crown,
   CreditCard,
 } from "lucide-react";
-import Image from "next/image";
 
 // ─── Font (applied once, inherited everywhere) ─────────────────────────────
 const font = {
@@ -152,22 +135,8 @@ const MAIN_MENU: NavItem[] = [
   { label: "Message", icon: MessageSquare },
   { label: "Payment", icon: CreditCard },
 ];
-const TOOLS_MENU: NavItem[] = [
-  { label: "Email", icon: Mail },
-  { label: "Automation", icon: Zap },
-  { label: "Analytics", icon: BarChart3 },
-  { label: "Integration", icon: Plug },
-];
-
 const BOTTOM_MENU: NavItem[] = [
-  { label: "Help center", icon: HelpCircle },
-  { label: "Feedback", icon: MessageCircle },
   { label: "Settings", icon: Settings },
-];
-
-const WORKSPACES = [
-  { label: "Campaign", count: 5, color: "bg-gray-900 dark:bg-neutral-100" },
-  { label: "Product Plan", count: 4, color: "bg-gray-400 dark:bg-neutral-600" },
 ];
 
 // Strictly black / white / gray. Status is communicated through the pill's
@@ -198,30 +167,6 @@ const TONE_CLASSES: Record<Tone, string> = {
   outline:
     "bg-white text-gray-400 border border-gray-300 dark:bg-neutral-900 dark:text-neutral-500 dark:border-neutral-700",
 };
-
-// Team avatars — Dicebear "notionists" set.
-const AVATARS = [
-  {
-    id: 1,
-    src: "https://api.dicebear.com/9.x/notionists/svg?seed=JK&backgroundColor=b6e3f4",
-  },
-  {
-    id: 2,
-    src: "https://api.dicebear.com/9.x/notionists/svg?seed=AM&backgroundColor=c0aede",
-  },
-  {
-    id: 3,
-    src: "https://api.dicebear.com/9.x/notionists/svg?seed=SL&backgroundColor=ffdfbf",
-  },
-  {
-    id: 4,
-    src: "https://api.dicebear.com/9.x/notionists/svg?seed=TR&backgroundColor=d1d4f9",
-  },
-  {
-    id: 5,
-    src: "https://api.dicebear.com/9.x/notionists/svg?seed=PW&backgroundColor=ffd5dc",
-  },
-];
 
 // ─── Datasets (one per nav item — this is what makes the sidebar "dynamic") ─
 function buildDatasets(): Record<string, Dataset> {
@@ -1039,28 +984,6 @@ function useToasts() {
   return { toasts, push };
 }
 
-function ToastStack({ toasts }: { toasts: Toast[] }) {
-  return (
-    <div className="pointer-events-none absolute bottom-5 right-5 z-30 flex flex-col gap-2">
-      <AnimatePresence>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            initial={{ opacity: 0, y: 10, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.96 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-3.5 py-2.5 text-sm font-medium text-white shadow-lg dark:border dark:border-neutral-700 dark:bg-neutral-800"
-          >
-            <CheckCircle2 size={15} className="text-green-300" />
-            {t.message}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 // ─── Small building blocks ──────────────────────────────────────────────────
 function Toggle({
   checked,
@@ -1272,15 +1195,11 @@ function Sidebar({
   setActive,
   search,
   setSearch,
-  onUpgrade,
-  onLearnMore,
 }: {
   active: string;
   setActive: (v: string) => void;
   search: string;
   setSearch: (v: string) => void;
-  onUpgrade: () => void;
-  onLearnMore: () => void;
 }) {
   return (
     <motion.aside
@@ -1290,25 +1209,20 @@ function Sidebar({
       className="flex h-full w-64 shrink-0 flex-col border-r border-gray-100 bg-white dark:border-neutral-800 dark:bg-black"
     >
       <div className="flex items-center justify-between p-4">
-        <button className="flex min-w-0 items-center gap-3 rounded-lg px-1.5 py-1 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800">
-          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg">
-            <Image
-              src="/logoR.png" // Remplace par le chemin de ton logo
-              alt="BagUI"
-              fill
-              className="object-contain"
-            />
+        <div className="flex min-w-0 items-center gap-3 rounded-lg px-1.5 py-1">
+          <div className="h-9 w-9 shrink-0 rounded-lg bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] grid place-items-center font-extrabold text-white text-sm shadow-lg shadow-[#ff5c2b]/30">
+            A
           </div>
 
           <div className="min-w-0 text-left">
             <p className="truncate text-sm font-semibold text-gray-900 dark:text-neutral-50">
-              Bag\UI
+              Axivon
             </p>
             <p className="truncate text-xs text-gray-500 dark:text-neutral-400">
-              Open Source UI Blocks
+              Admin Panel
             </p>
           </div>
-        </button>
+        </div>
       </div>
 
       <div className="px-4 pb-2">
@@ -1355,97 +1269,12 @@ function Sidebar({
             />
           ))}
         </div>
-
-        <SectionLabel>Tools</SectionLabel>
-        <div className="flex flex-col gap-0.5">
-          {TOOLS_MENU.map((item) => (
-            <NavLink
-              key={item.label}
-              item={item}
-              active={active === item.label}
-              onClick={() => setActive(item.label)}
-            />
-          ))}
-        </div>
-
-        <SectionLabel>Workspace</SectionLabel>
-        <div className="flex flex-col gap-0.5">
-          {WORKSPACES.map((w) => (
-            <motion.button
-              key={w.label}
-              variants={fadeUp}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
-            >
-              <span className={`h-2 w-2 rounded-full ${w.color}`} />
-              <span className="flex-1 text-left">{w.label}</span>
-              <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] font-semibold text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
-                {w.count}
-              </span>
-            </motion.button>
-          ))}
-        </div>
       </motion.nav>
-
-      <div className="flex flex-col gap-0.5 border-t border-gray-100 px-3 py-4 dark:border-neutral-800">
-        {BOTTOM_MENU.map((item) => (
-          <NavLink
-            key={item.label}
-            item={item}
-            active={active === item.label}
-            onClick={() => setActive(item.label)}
-          />
-        ))}
-
-        <div className="mt-2 rounded-2xl border border-gray-200 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-900">
-          <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-neutral-50">
-            Upgrade Pro
-            <Sparkles
-              size={13}
-              className="text-gray-400 dark:text-neutral-500"
-            />
-          </p>
-          <p className="mb-3 text-xs leading-snug text-gray-500 dark:text-neutral-400">
-            Higher productivity with better organization
-          </p>
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onUpgrade}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gray-900 py-1.5 text-xs font-semibold text-white hover:bg-gray-800 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-200 cursor-pointer"
-            >
-              <Crown size={12} />
-              Upgrade
-            </motion.button>
-            <button
-              onClick={onLearnMore}
-              className="flex-1 rounded-full border border-gray-200 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 cursor-pointer"
-            >
-              Learn more
-            </button>
-          </div>
-        </div>
-      </div>
     </motion.aside>
   );
 }
 
 // ─── Top bar ────────────────────────────────────────────────────────────────
-function AvatarStack() {
-  return (
-    <div className="flex items-center -space-x-2">
-      {AVATARS.map((a) => (
-        <img
-          key={a.id}
-          src={a.src}
-          alt="Team member avatar"
-          className="h-8 w-8 rounded-full border-2 border-white bg-gray-100 object-cover dark:border-black dark:bg-neutral-800"
-        />
-      ))}
-    </div>
-  );
-}
-
 function ThemeToggle({
   darkMode,
   setDarkMode,
@@ -1516,21 +1345,21 @@ function ThemeToggle({
 
 function TopBar({
   title,
-  onShare,
-  onCustomizeWidget,
-  notifCount,
-  onBell,
   darkMode,
   setDarkMode,
+  profile,
 }: {
   title: string;
-  onShare: () => void;
-  onCustomizeWidget: () => void;
-  notifCount: number;
-  onBell: () => void;
   darkMode: boolean;
   setDarkMode: (v: boolean) => void;
+  profile?: { full_name?: string; email?: string; role?: string };
 }) {
+  const initials = (profile?.full_name || profile?.email || "A")
+    .split(/[\s@.]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("");
   return (
     <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-neutral-800">
       <h1 className="text-xl font-semibold text-gray-900 dark:text-neutral-50">
@@ -1538,34 +1367,21 @@ function TopBar({
       </h1>
       <div className="flex items-center gap-3">
         <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
-        <button
-          onClick={onShare}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300 cursor-pointer"
-        >
-          <Share2 size={16} />
-        </button>
-        <button
-          onClick={onBell}
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300 cursor-pointer"
-        >
-          <Bell size={20} />
-          {notifCount > 0 && (
-            <span className="absolute right-1.5 top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-semibold text-white dark:bg-red-500 dark:text-white">
-              {notifCount}
-            </span>
-          )}
-        </button>
-        <AvatarStack />
-        <span className="h-6 w-px bg-gray-200 dark:bg-neutral-700" />
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onCustomizeWidget}
-          className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-200 cursor-pointer"
-        >
-          <SlidersHorizontal size={14} />
-          Customize Widget
-        </motion.button>
+        {profile && (
+          <div className="flex items-center gap-2.5 pl-2 border-l border-gray-200 dark:border-neutral-700">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] grid place-items-center text-white text-xs font-bold">
+              {initials || "A"}
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-semibold text-gray-900 dark:text-neutral-50 leading-tight">
+                {profile.full_name || "Admin"}
+              </div>
+              <div className="text-[10px] text-gray-500 dark:text-neutral-400 leading-tight uppercase">
+                {profile.role || "admin"}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1580,10 +1396,6 @@ function Toolbar({
   statusOptions,
   showStats,
   setShowStats,
-  onCustomize,
-  onExport,
-  onAdd,
-  addLabel,
 }: {
   statusFilter: string;
   setStatusFilter: (v: string) => void;
@@ -1592,26 +1404,10 @@ function Toolbar({
   statusOptions: string[];
   showStats: boolean;
   setShowStats: (v: boolean) => void;
-  onCustomize: () => void;
-  onExport: () => void;
-  onAdd: () => void;
-  addLabel: string;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-6 pt-5">
       <div className="flex flex-wrap items-center gap-2">
-        <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800">
-          <LayoutGrid
-            size={14}
-            className="text-gray-400 dark:text-neutral-500"
-          />
-          Table View
-          <ChevronDown
-            size={14}
-            className="text-gray-400 dark:text-neutral-500"
-          />
-        </button>
-
         <Dropdown
           label="Filter"
           icon={Filter}
@@ -1633,35 +1429,6 @@ function Toolbar({
           </span>
           <Toggle checked={showStats} onChange={setShowStats} />
         </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onCustomize}
-          className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 cursor-pointer"
-        >
-          <SlidersHorizontal
-            size={14}
-            className="text-gray-400 dark:text-neutral-500"
-          />
-          Customize
-        </button>
-        <button
-          onClick={onExport}
-          className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 cursor-pointer"
-        >
-          <Download size={14} className="text-gray-400 dark:text-neutral-500" />
-          Export
-        </button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onAdd}
-          className="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-1.5 text-sm font-medium text-white hover:bg-gray-800 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-200 cursor-pointer"
-        >
-          <Plus size={14} />
-          {addLabel}
-        </motion.button>
       </div>
     </div>
   );
@@ -1729,105 +1496,26 @@ function StatsRow({
   );
 }
 
-function CustomizePopover({
-  columns,
-  visibleCols,
-  toggleCol,
-  onClose,
-}: {
-  columns: string[];
-  visibleCols: Record<string, boolean>;
-  toggleCol: (c: string) => void;
-  onClose: () => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [onClose]);
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: -6, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -6, scale: 0.98 }}
-      className="absolute right-6 top-16 z-20 w-56 rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
-    >
-      <p className="px-2 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
-        Visible columns
-      </p>
-      {columns.map((c) => {
-        const checked = visibleCols[c] !== false;
-        return (
-          <div
-            key={c}
-            role="button"
-            tabIndex={0}
-            onClick={() => toggleCol(c)}
-            onKeyDown={(e) =>
-              (e.key === "Enter" || e.key === " ") && toggleCol(c)
-            }
-            className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1.5 text-left text-sm text-gray-600 hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
-          >
-            {c}
-            <span
-              aria-hidden
-              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                checked
-                  ? "border-gray-900 bg-gray-900 dark:border-neutral-100 dark:bg-neutral-100"
-                  : "border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-900"
-              }`}
-            >
-              {checked && (
-                <Check
-                  size={11}
-                  className="text-white dark:text-neutral-900"
-                  strokeWidth={3}
-                />
-              )}
-            </span>
-          </div>
-        );
-      })}
-    </motion.div>
-  );
-}
-
 // ─── Table ──────────────────────────────────────────────────────────────────
 function ProductTable({
   columns,
   rows,
-  visibleCols,
   selected,
   toggleRow,
   toggleAll,
   sortKey,
   sortDir,
   onSortColumn,
-  editingId,
-  editValue,
-  setEditValue,
-  onCommitEdit,
 }: {
   columns: ColumnDef[];
   rows: Row[];
-  visibleCols: Record<string, boolean>;
   selected: Set<string>;
   toggleRow: (id: string) => void;
   toggleAll: () => void;
   sortKey: string | null;
   sortDir: "asc" | "desc";
   onSortColumn: (key: string) => void;
-  editingId: string | null;
-  editValue: string;
-  setEditValue: (v: string) => void;
-  onCommitEdit: () => void;
 }) {
-  const cols = columns.filter((c) => visibleCols[c.label] !== false);
   const allChecked = rows.length > 0 && selected.size === rows.length;
 
   return (
@@ -1838,7 +1526,7 @@ function ProductTable({
             <th className="w-10 py-3 pl-4">
               <Checkbox checked={allChecked} onChange={toggleAll} />
             </th>
-            {cols.map((c) => (
+            {columns.map((c) => (
               <th
                 key={c.key}
                 className="py-3 pr-4 text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-neutral-500"
@@ -1860,18 +1548,13 @@ function ProductTable({
                 </button>
               </th>
             ))}
-            <th className="w-10 py-3 pr-4 text-right">
-              <button className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-800">
-                <Plus size={13} />
-              </button>
-            </th>
           </tr>
         </thead>
         <motion.tbody variants={stagger} initial="hidden" animate="visible">
           {rows.length === 0 && (
             <tr>
               <td
-                colSpan={cols.length + 2}
+                colSpan={columns.length + 1}
                 className="px-4 py-10 text-center text-sm text-gray-400 dark:text-neutral-500"
               >
                 No results match your search/filter.
@@ -1880,7 +1563,6 @@ function ProductTable({
           )}
           {rows.map((r) => {
             const isSelected = selected.has(r.id);
-            const isEditing = editingId === r.id;
             return (
               <motion.tr
                 key={r.id}
@@ -1898,7 +1580,7 @@ function ProductTable({
                     onChange={() => toggleRow(r.id)}
                   />
                 </td>
-                {cols.map((c, i) => {
+                {columns.map((c, i) => {
                   if (c.key === "status") {
                     return (
                       <td key={c.key} className="py-3 pr-4">
@@ -1914,30 +1596,7 @@ function ProductTable({
                     );
                   }
                   const raw = r.cells[c.key];
-                  const isMoney = [
-                    "price",
-                    "revenue",
-                    "spent",
-                    "total",
-                  ].includes(c.key);
-                  const display =
-                    typeof raw === "number" && isMoney
-                      ? `$${raw.toFixed(2)}`
-                      : (raw ?? "—");
-                  if (i === 0 && isEditing) {
-                    return (
-                      <td key={c.key} className="py-2 pr-4">
-                        <input
-                          autoFocus
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && onCommitEdit()}
-                          onBlur={onCommitEdit}
-                          className="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 outline-none focus:border-gray-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-neutral-400"
-                        />
-                      </td>
-                    );
-                  }
+                  const display = (raw ?? "—");
                   return (
                     <td
                       key={c.key}
@@ -1951,75 +1610,12 @@ function ProductTable({
                     </td>
                   );
                 })}
-                <td />
               </motion.tr>
             );
           })}
         </motion.tbody>
       </table>
     </div>
-  );
-}
-
-// ─── Bulk action bar ────────────────────────────────────────────────────────
-function BulkActionBar({
-  count,
-  onClear,
-  onApplyCode,
-  onEditInfo,
-  onDelete,
-}: {
-  count: number;
-  onClear: () => void;
-  onApplyCode: () => void;
-  onEditInfo: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <AnimatePresence>
-      {count > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 16 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="sticky bottom-4 z-10 mx-auto flex w-fit items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
-        >
-          <span className="text-sm font-medium text-gray-700 dark:text-neutral-200">
-            {count} Selected
-          </span>
-          <span className="h-4 w-px bg-gray-200 dark:bg-neutral-700" />
-          <button
-            onClick={onApplyCode}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-neutral-50"
-          >
-            Apply Code
-          </button>
-          <button
-            onClick={onEditInfo}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-neutral-50"
-          >
-            Edit Info
-          </button>
-          <button
-            onClick={onDelete}
-            className="flex items-center gap-1 text-sm font-medium text-red-500 transition-colors hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
-          >
-            <Trash2 size={13} />
-            Delete
-          </button>
-          <button className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-800">
-            <MoreHorizontal size={15} />
-          </button>
-          <button
-            onClick={onClear}
-            className="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-800"
-          >
-            <X size={15} />
-          </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -2171,16 +1767,8 @@ export default function Dashboard2({
   const [selected, setSelected] = useState<Set<string>>(new Set(["p2", "p4"]));
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [visibleStats, setVisibleStats] = useState<Record<string, boolean[]>>(
-    {},
-  );
-  const [visibleCols, setVisibleCols] = useState<Record<string, boolean>>({});
-  const [customizeOpen, setCustomizeOpen] = useState(false);
   const [focusedStat, setFocusedStat] = useState<string | null>(null);
-  const [notifCount, setNotifCount] = useState(3);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState("");
-  const { toasts, push } = useToasts();
+  const { push } = useToasts();
 
   // `active` is normally guaranteed to match a key in `datasets` (every nav
   // item's label has a matching entry from buildDatasets()). This fallback
@@ -2204,15 +1792,13 @@ export default function Dashboard2({
     setSelected(new Set());
     setPage(1);
     setFocusedStat(null);
-    setCustomizeOpen(false);
-    setVisibleCols({});
   }, [active]);
 
   const statusOptions = useMemo(
     () => ["All", ...Array.from(new Set(dataset.rows.map((r) => r.status)))],
     [dataset],
   );
-  const statsVisibility = visibleStats[active] ?? dataset.stats.map(() => true);
+  const statsVisibility = dataset.stats.map(() => true);
 
   const filteredRows = useMemo(() => {
     let rows = dataset.rows;
@@ -2287,52 +1873,6 @@ export default function Dashboard2({
     setSortOption("Default");
   };
 
-  const handleAdd = () => {
-    const nameKey = dataset.columns[0].key;
-    const newId = `${active}-${Date.now()}`;
-    const newRow: Row = {
-      id: newId,
-      status: (statusOptions[1] ?? "Active") as Status,
-      rating: dataset.columns.some((c) => c.key === "rating") ? 5.0 : undefined,
-      cells: Object.fromEntries(
-        dataset.columns
-          .filter((c) => c.key !== "status" && c.key !== "rating")
-          .map((c) => [
-            c.key,
-            c.key === nameKey ? "New entry" : c.numeric ? 0 : "—",
-          ]),
-      ),
-    };
-    setDatasets((prev) => ({
-      ...prev,
-      [active]: { ...prev[active], rows: [newRow, ...prev[active].rows] },
-    }));
-    setEditingId(newId);
-    setEditValue("New entry");
-    setPage(1);
-    push(`${dataset.addLabel} — row added`);
-  };
-
-  const commitEdit = () => {
-    if (!editingId) return;
-    const nameKey = dataset.columns[0].key;
-    setDatasets((prev) => ({
-      ...prev,
-      [active]: {
-        ...prev[active],
-        rows: prev[active].rows.map((r) =>
-          r.id === editingId
-            ? {
-                ...r,
-                cells: { ...r.cells, [nameKey]: editValue || "Untitled" },
-              }
-            : r,
-        ),
-      },
-    }));
-    setEditingId(null);
-  };
-
   const handleDelete = () => {
     setDatasets((prev) => ({
       ...prev,
@@ -2345,54 +1885,6 @@ export default function Dashboard2({
     setSelected(new Set());
   };
 
-  const handleApplyCode = () =>
-    push(`Promo code applied to ${selected.size} row(s)`);
-
-  const handleEditInfo = () => {
-    const firstId = Array.from(selected)[0];
-    const row = dataset.rows.find((r) => r.id === firstId);
-    if (row) {
-      setEditingId(firstId);
-      setEditValue(String(row.cells[dataset.columns[0].key]));
-    }
-    push("Editing first selected row");
-  };
-
-  const handleExport = () => {
-    const cols = dataset.columns.filter((c) => visibleCols[c.label] !== false);
-    const header = [...cols.map((c) => c.label)].join(",");
-    const lines = filteredRows.map((r) =>
-      cols
-        .map((c) =>
-          c.key === "status"
-            ? r.status
-            : c.key === "rating"
-              ? (r.rating ?? "")
-              : (r.cells[c.key] ?? ""),
-        )
-        .join(","),
-    );
-    const csv = [header, ...lines].join("\n");
-    try {
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${active.toLowerCase()}-export.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      // ignore outside the browser
-    }
-    push(`Exported ${filteredRows.length} rows as CSV`);
-  };
-
-  const toggleCol = (label: string) =>
-    setVisibleCols((prev) => ({
-      ...prev,
-      [label]: prev[label] === false ? true : false,
-    }));
-
   return (
     <div className={darkMode ? "dark" : ""}>
       <div
@@ -2404,22 +1896,14 @@ export default function Dashboard2({
           setActive={setActive}
           search={search}
           setSearch={setSearch}
-          onUpgrade={() => push("Redirecting to billing…")}
-          onLearnMore={() => push("Opening plan details…")}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
             title={dataset.title}
-            onShare={() => push("Share link copied")}
-            onCustomizeWidget={() => setCustomizeOpen((o) => !o)}
-            notifCount={notifCount}
-            onBell={() => {
-              setNotifCount(0);
-              push("Notifications cleared");
-            }}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
+            profile={profile}
           />
           <div className="relative flex-1 overflow-y-auto pb-4">
             <Toolbar
@@ -2433,22 +1917,7 @@ export default function Dashboard2({
               statusOptions={statusOptions}
               showStats={showStats}
               setShowStats={setShowStats}
-              onCustomize={() => setCustomizeOpen((o) => !o)}
-              onExport={handleExport}
-              onAdd={handleAdd}
-              addLabel={dataset.addLabel}
             />
-
-            <AnimatePresence>
-              {customizeOpen && (
-                <CustomizePopover
-                  columns={dataset.columns.map((c) => c.label)}
-                  visibleCols={visibleCols}
-                  toggleCol={toggleCol}
-                  onClose={() => setCustomizeOpen(false)}
-                />
-              )}
-            </AnimatePresence>
 
             {showStats && (
               <StatsRow
@@ -2463,24 +1932,12 @@ export default function Dashboard2({
               <ProductTable
                 columns={dataset.columns}
                 rows={pagedRows}
-                visibleCols={visibleCols}
                 selected={selected}
                 toggleRow={toggleRow}
                 toggleAll={toggleAll}
                 sortKey={sortKey}
                 sortDir={sortDir}
                 onSortColumn={onSortColumn}
-                editingId={editingId}
-                editValue={editValue}
-                setEditValue={setEditValue}
-                onCommitEdit={commitEdit}
-              />
-              <BulkActionBar
-                count={selected.size}
-                onClear={() => setSelected(new Set())}
-                onApplyCode={handleApplyCode}
-                onEditInfo={handleEditInfo}
-                onDelete={handleDelete}
               />
               <Pagination
                 page={page}
@@ -2492,8 +1949,6 @@ export default function Dashboard2({
             </div>
           </div>
         </main>
-
-        <ToastStack toasts={toasts} />
       </div>
     </div>
   );
