@@ -333,27 +333,31 @@ function Step1Nominal({ ntabs, activeNtab, setActiveNtab, nominals, selectedNomi
       </div>
 
       <h3 className="mt-5 text-sm font-semibold text-[#9aa3ad]">Harga spesial minggu ini</h3>
-      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
         {nominals.map((n, i) => (
-          <label key={i} className="relative block cursor-pointer" onClick={() => setSelectedNominal(i)}>
-            <div className={`bg-[#1c2026] border rounded-xl p-4 h-full transition ${selectedNominal === i ? "border-[#ff5c2b] bg-[#231a17]" : "border-[#262b33]"}`}>
-              <div className="flex items-start justify-between gap-2">
+          <label key={i} className="relative block cursor-pointer group" onClick={() => setSelectedNominal(i)}>
+            <div className={`relative bg-[#1c2026] border rounded-lg sm:rounded-xl p-2.5 sm:p-4 h-full transition-all duration-150 ${
+              selectedNominal === i
+                ? "border-[#ff5c2b] bg-[#231a17] shadow-[inset_0_0_0_1px_rgba(255,92,43,0.4)]"
+                : "border-[#262b33] hover:border-[#3a424e] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+            }`}>
+              <div className="flex items-start justify-between gap-1.5">
                 <NominalIcon color={iconColor} kind={iconKind} />
                 {n.badge && (
-                  <span className="text-[10px] font-bold tracking-wide px-1.5 py-0.5 rounded bg-[#ff5c2b] text-white">{n.badge}</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-wide px-1.5 py-0.5 rounded bg-[#ff5c2b] text-white">{n.badge}</span>
                 )}
-                <span className={`w-5 h-5 rounded-full bg-[#ff5c2b] grid place-items-center transition ml-auto ${selectedNominal === i ? "opacity-100" : "opacity-0"}`}>
+                <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#ff5c2b] grid place-items-center transition ml-auto ${selectedNominal === i ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
                   <CheckIcon />
                 </span>
               </div>
-              <div className="mt-3 font-semibold text-sm leading-snug">{n.label}</div>
-              <div className="text-xs text-[#9aa3ad] mt-0.5">{n.desc}</div>
-              <div className="mt-3 flex items-baseline gap-2 flex-wrap">
-                <span className="text-xs text-[#9aa3ad] line-through">{rupiah(n.oldPrice)}</span>
-                <span className="font-bold text-[#ff5c2b]">{rupiah(n.price)}</span>
+              <div className="mt-2 sm:mt-3 font-semibold text-[12px] sm:text-sm leading-snug">{n.label}</div>
+              <div className="text-[10px] sm:text-xs text-[#9aa3ad] mt-0.5 line-clamp-1">{n.desc}</div>
+              <div className="mt-2 sm:mt-3 flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
+                <span className="text-[10px] sm:text-xs text-[#9aa3ad] line-through">{rupiah(n.oldPrice)}</span>
+                <span className="font-bold text-[#ff5c2b] text-sm sm:text-base">{rupiah(n.price)}</span>
               </div>
-              <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] text-[#9aa3ad]">
-                <svg className="w-3.5 h-3.5 text-[#ffb020]" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9" /></svg>
+              <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1 text-[10px] sm:text-[11px] text-[#9aa3ad]">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#ffb020]" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9" /></svg>
                 +{n.coins.toLocaleString("id-ID")} koin
               </div>
             </div>
