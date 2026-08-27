@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateOrderStatusAction, deleteOrderAction } from "@/app/admin/(protected)/actions";
+import { useConfirm } from "./useConfirm";
 
 const rupiah = (n: number) => "Rp" + Number(n || 0).toLocaleString("id-ID");
 
@@ -110,6 +111,7 @@ export function OrdersManager({ orders, actorLabel }: { orders: Order[]; actorLa
 }
 
 function OrderRow({ order, actorLabel }: { order: Order; actorLabel: string }) {
+  const confirm = useConfirm();
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState(order.status);
   const dirty = status !== order.status;
@@ -176,8 +178,15 @@ function OrderRow({ order, actorLabel }: { order: Order; actorLabel: string }) {
           </button>
           <form
             action={deleteOrderAction}
-            onSubmit={(e) => {
-              if (!confirm(`Hapus order ${order.order_code}?`)) e.preventDefault();
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const ok = await confirm({
+                title: "Hapus order?",
+                message: `Order ${order.order_code} akan dihapus permanen dan tidak bisa dikembalikan.`,
+                confirmText: "Hapus",
+                variant: "danger",
+              });
+              if (ok) (e.currentTarget as HTMLFormElement).requestSubmit();
             }}
             className="inline"
           >

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
+import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
-const STATIC: Omit<GameTopUpConfig, "nominals"> = {
+const STATIC: Omit<GameTopUpConfig, "nominals" | "payments"> = {
   slug: "/free-fire",
   name: "Free Fire",
   shortName: "Free Fire",
@@ -23,11 +24,6 @@ const STATIC: Omit<GameTopUpConfig, "nominals"> = {
     <>Buka profil di dalam game, ID terlihat di samping avatar kamu. Contoh: <span className="text-[#eef1f4]">123456789</span>.</>
   ),
   ntabs: ["Promo", "Diamond", "Membership", "Bundle", "Event"],
-  payments: [
-    { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
-    { label: "DANA", fee: 1000, desc: "Biaya Rp1.000" },
-    { label: "OVO", fee: 1500, desc: "Biaya Rp1.500" },
-  ],
   howToSteps: [
     "Login ke akun Free Fire kamu (Google/Facebook/VK).",
     "Salin Free Fire ID dari profil dalam game.",
@@ -54,13 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FreeFirePage() {
   const admin = createSupabaseAdminClient();
-  const [{ data: prods }] = await Promise.all([
+  const [{ data: prods }, payments] = await Promise.all([
     admin
       .from("products")
       .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
       .eq("game_id", 3)
       .eq("is_active", true)
       .order("sort_order"),
+    loadActivePaymentMethods(),
   ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
@@ -103,7 +100,7 @@ export default async function FreeFirePage() {
     <>
       <Script id="ld-product-ff" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <Script id="ld-breadcrumb-ff" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="diamond" />
+      <GameTopUpPage config={{ ...STATIC, nominals, payments }} iconKind="diamond" />
     </>
   );
 }

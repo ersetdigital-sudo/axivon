@@ -7,6 +7,7 @@ import {
   updateProductAction,
   deleteProductAction,
 } from "@/app/admin/(protected)/actions";
+import { useConfirm } from "./useConfirm";
 
 const rupiah = (n: number) => "Rp" + Number(n || 0).toLocaleString("id-ID");
 
@@ -27,6 +28,7 @@ type Product = {
 type Game = { id: number; name: string; short_name: string; slug: string };
 
 export function ProductsManager({ products, games }: { products: Product[]; games: Game[] }) {
+  const confirm = useConfirm();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [pendingToggle, startToggle] = useTransition();
@@ -172,8 +174,15 @@ export function ProductsManager({ products, games }: { products: Product[]; game
                             </button>
                             <form
                               action={deleteProductAction}
-                              onSubmit={(e) => {
-                                if (!confirm(`Hapus produk "${p.label}"? Tindakan ini tidak bisa dibatalkan.`)) e.preventDefault();
+                              onSubmit={async (e) => {
+                                e.preventDefault();
+                                const ok = await confirm({
+                                  title: "Hapus produk?",
+                                  message: `Produk "${p.label}" akan dihapus permanen dan tidak bisa dikembalikan.`,
+                                  confirmText: "Hapus",
+                                  variant: "danger",
+                                });
+                                if (ok) (e.currentTarget as HTMLFormElement).requestSubmit();
                               }}
                               className="inline"
                             >

@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
-const STATIC: Omit<GameTopUpConfig, "nominals"> = {
+const STATIC: Omit<GameTopUpConfig, "nominals" | "payments"> = {
   slug: "/mobile-legends",
   name: "Mobile Legends: Bang Bang",
   shortName: "Mobile Legends",
@@ -27,11 +28,6 @@ const STATIC: Omit<GameTopUpConfig, "nominals"> = {
     </>
   ),
   ntabs: ["Harga Spesial", "MLBB Pass", "Elite Bundle", "Event", "Diamonds"],
-  payments: [
-    { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
-    { label: "DANA", fee: 1000, desc: "Biaya Rp1.000" },
-    { label: "Transfer BCA", fee: 2500, desc: "Biaya Rp2.500" },
-  ],
   howToSteps: [
     "Masukkan User ID dan Zone ID kamu.",
     "Contoh: 1234567 (1234).",
@@ -65,14 +61,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MobileLegendsPage() {
   const admin = createSupabaseAdminClient();
-  const [{ data: prods }, { data: gameRow }] = await Promise.all([
+  const [{ data: prods }, payments] = await Promise.all([
     admin
       .from("products")
       .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
       .eq("game_id", 1)
       .eq("is_active", true)
       .order("sort_order"),
-    admin.from("games").select("id, slug, name").eq("id", 1).single(),
+    loadActivePaymentMethods(),
   ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
@@ -126,7 +122,7 @@ export default async function MobileLegendsPage() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <GameTopUpPage config={{ ...STATIC, nominals }} />
+      <GameTopUpPage config={{ ...STATIC, nominals, payments }} />
     </>
   );
 }

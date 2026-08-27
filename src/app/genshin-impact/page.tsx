@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import GameTopUpPage, { type GameTopUpConfig } from "@/components/GameTopUpPage";
+import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
 
 export const dynamic = "force-dynamic";
 
-const STATIC: Omit<GameTopUpConfig, "nominals"> = {
+const STATIC: Omit<GameTopUpConfig, "nominals" | "payments"> = {
   slug: "/genshin-impact",
   name: "Genshin Impact",
   shortName: "Genshin Impact",
@@ -24,11 +25,7 @@ const STATIC: Omit<GameTopUpConfig, "nominals"> = {
     <>Buka game, tap Paimon Menu kiri atas. UID tertera di pojok kanan bawah. Server: Asia / America / Europe / TW / SAR.</>
   ),
   ntabs: ["Promo", "Genesis Crystal", "Blessing", "Bundle", "Event"],
-  payments: [
-    { label: "QRIS", fee: 0, desc: "Semua e-wallet & m-banking" },
-    { label: "GoPay", fee: 1000, desc: "Biaya Rp1.000" },
-    { label: "Transfer BCA", fee: 2500, desc: "Biaya Rp2.500" },
-  ],
+
   howToSteps: [
     "Buka Genshin Impact, masuk ke Paimon Menu.",
     "Salin UID di pojok kanan bawah profil kamu.",
@@ -55,13 +52,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GenshinImpactPage() {
   const admin = createSupabaseAdminClient();
-  const [{ data: prods }] = await Promise.all([
+  const [{ data: prods }, payments] = await Promise.all([
     admin
       .from("products")
       .select("id, label, price, old_price, coins, description, badge, icon_color, sort_order")
       .eq("game_id", 6)
       .eq("is_active", true)
       .order("sort_order"),
+    loadActivePaymentMethods(),
   ]);
   const nominals = (prods || []).map((p) => ({
     id: p.id,
@@ -104,7 +102,7 @@ export default async function GenshinImpactPage() {
     <>
       <Script id="ld-product-gi" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <Script id="ld-breadcrumb-gi" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <GameTopUpPage config={{ ...STATIC, nominals }} iconKind="crystal" />
+      <GameTopUpPage config={{ ...STATIC, nominals, payments }} iconKind="crystal" />
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
+import { useConfirm } from "./useConfirm";
 import {
   togglePaymentMethodAction,
   updatePaymentMethodAction,
@@ -34,6 +35,7 @@ type Method = {
 };
 
 export function PaymentsManager({ methods }: { methods: Method[] }) {
+  const confirm = useConfirm();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [pending, startPending] = useTransition();
   const [optimisticActive, setOptimisticActive] = useState<Record<number, boolean>>({});
@@ -147,8 +149,15 @@ export function PaymentsManager({ methods }: { methods: Method[] }) {
                     <div className="flex justify-end gap-2 pt-2">
                       <form
                         action={deletePaymentMethodAction}
-                        onSubmit={(e) => {
-                          if (!confirm(`Hapus metode pembayaran "${m.label}"? Tindakan ini tidak bisa dibatalkan.`)) e.preventDefault();
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const ok = await confirm({
+                            title: "Hapus metode pembayaran?",
+                            message: `Metode "${m.label}" akan dihapus permanen dan tidak bisa dikembalikan.`,
+                            confirmText: "Hapus",
+                            variant: "danger",
+                          });
+                          if (ok) (e.currentTarget as HTMLFormElement).requestSubmit();
                         }}
                         className="inline"
                       >

@@ -20,6 +20,7 @@ export interface NominalItem {
 }
 
 export interface PaymentItem {
+  id?: number;
   label: string;
   fee: number;
   desc: string;
@@ -461,6 +462,7 @@ function SummaryPanel({ nom, pay, total, account, showWarn, allFilled, handleBuy
         <input type="hidden" name="product_old_price" value={nom.oldPrice} />
         <input type="hidden" name="payment_label" value={pay.label} />
         <input type="hidden" name="payment_fee" value={pay.fee} />
+        {pay.id && <input type="hidden" name="payment_id" value={pay.id} />}
         <input type="hidden" name="customer_uid" value={customerUid} />
         <input type="hidden" name="customer_zid" value={customerZid} />
         <input type="hidden" name="customer_whatsapp" value={customerWhatsapp} />

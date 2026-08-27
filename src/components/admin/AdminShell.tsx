@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { logoutAction } from "@/app/admin/(protected)/actions";
 import { Toast } from "./Toast";
+import { ConfirmProvider } from "./useConfirm";
 
 type NavItem = {
   href: string;
@@ -37,8 +38,9 @@ export function AdminShell({ profile, toast, children }: Props) {
     .join("");
 
   return (
-    <div className="min-h-screen bg-[#101215] text-[#eef1f4] flex">
-      {toast && <Toast message={toast.message} variant={toast.variant} />}
+    <ConfirmProvider>
+      <div className="min-h-screen bg-[#101215] text-[#eef1f4] flex">
+        {toast && <Toast message={toast.message} variant={toast.variant} />}
 
       {/* Sidebar */}
       <aside
@@ -121,7 +123,8 @@ export function AdminShell({ profile, toast, children }: Props) {
 
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">{children}</main>
       </div>
-    </div>
+      </div>
+    </ConfirmProvider>
   );
 }
 
