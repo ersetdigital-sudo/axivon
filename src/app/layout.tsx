@@ -25,7 +25,7 @@ const bricolage = localFont({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivongames.net";
 const SITE_NAME = "Axivon Games";
 const SITE_DESC = "Top up diamond, UC, dan voucher game favoritmu dalam 30 detik. Harga murah, proses otomatis 24 jam, dijamin aman.";
 

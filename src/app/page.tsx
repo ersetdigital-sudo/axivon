@@ -12,7 +12,7 @@ import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivongames.net";
 
 export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },

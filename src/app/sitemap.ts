@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivongames.net";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createSupabaseAdminClient();

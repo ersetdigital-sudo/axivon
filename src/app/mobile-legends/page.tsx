@@ -5,7 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { loadActivePaymentMethods } from "@/lib/game-payment-loader";
 import { getSiteSettings } from "@/lib/site-settings";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivon-psi.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://axivongames.net";
 
 export const dynamic = "force-dynamic";
 
