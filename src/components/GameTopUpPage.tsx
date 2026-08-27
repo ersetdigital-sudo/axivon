@@ -249,25 +249,89 @@ function NoticeBar({ notice }: { notice: string }) {
   );
 }
 
+function TabIcon({ kind, active }: { kind: "promo" | "wallet" | "star" | "box" | "bolt"; active: boolean }) {
+  const className = `w-4 h-4 ${active ? "text-white" : "text-[#9aa3ad]"}`;
+  switch (kind) {
+    case "wallet":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="6" width="18" height="14" rx="2.5" />
+          <path d="M3 10h18" />
+          <circle cx="17" cy="15" r="1.4" fill="currentColor" />
+        </svg>
+      );
+    case "star":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8z" />
+        </svg>
+      );
+    case "box":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
+          <path d="m3 8 9 5 9-5M12 13v8" />
+        </svg>
+      );
+    case "bolt":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z" />
+        </svg>
+      );
+    case "promo":
+    default:
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z" />
+          <circle cx="8" cy="8" r="1.4" fill="currentColor" />
+        </svg>
+      );
+  }
+}
+
 function Step1Nominal({ ntabs, activeNtab, setActiveNtab, nominals, selectedNominal, setSelectedNominal, iconKind, iconColor }: {
   ntabs: string[]; activeNtab: number; setActiveNtab: (n: number) => void;
   nominals: NominalItem[]; selectedNominal: number; setSelectedNominal: (n: number) => void;
   iconKind: "diamond" | "uc" | "crystal" | "coin"; iconColor: string;
 }) {
+  const tabIcons = ["promo", "wallet", "star", "box", "bolt"] as const;
   return (
     <section className="bg-[#171a1f] border border-[#262b33] rounded-xl p-4 sm:p-5">
       <div className="flex items-center gap-3">
         <span className="w-6 h-6 rounded-lg grid place-items-center text-xs font-bold bg-[#ff5c2b] text-white">1</span>
         <h2 className="font-bold text-lg">Pilih nominal</h2>
       </div>
-      <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1 text-sm -mx-4 sm:mx-0 px-4 sm:px-0">
+
+      <div className="mt-4 grid grid-cols-3 gap-2 sm:hidden">
         {ntabs.map((t, i) => (
           <button key={t} onClick={() => setActiveNtab(i)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-lg font-semibold transition ${activeNtab === i ? "bg-[#eef1f4] text-[#101215]" : "bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] hover:text-white"}`}>
+            className={`relative flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl font-semibold text-[11px] leading-tight transition-all ${
+              activeNtab === i
+                ? "bg-gradient-to-br from-[#ff5c2b] to-[#ff7a3f] text-white shadow-lg shadow-[#ff5c2b]/25"
+                : "bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] active:scale-95"
+            }`}>
+            <TabIcon kind={tabIcons[i] || "promo"} active={activeNtab === i} />
+            <span className="line-clamp-1">{t}</span>
+            {activeNtab === i && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white" />}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 hidden sm:flex gap-2 overflow-x-auto no-scrollbar pb-1 text-sm">
+        {ntabs.map((t, i) => (
+          <button key={t} onClick={() => setActiveNtab(i)}
+            className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
+              activeNtab === i
+                ? "bg-[#eef1f4] text-[#101215] shadow-md"
+                : "bg-[#1c2026] border border-[#262b33] text-[#9aa3ad] hover:text-white hover:border-[#3a424e]"
+            }`}>
+            <TabIcon kind={tabIcons[i] || "promo"} active={activeNtab === i} />
             {t}
           </button>
         ))}
       </div>
+
       <h3 className="mt-5 text-sm font-semibold text-[#9aa3ad]">Harga spesial minggu ini</h3>
       <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {nominals.map((n, i) => (
